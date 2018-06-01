@@ -1,6 +1,6 @@
 /*
 Computação Gráfica - Projeto Final - main
-Versão: 1.1
+Versão: 1.2
 */
 
 #include <GL/glut.h>
@@ -10,7 +10,7 @@ Versão: 1.1
 #define DEFAULT_WINDOW_SIZE_H 800.0
 
 GLfloat angle;
-int width, heigth;	
+int width, heigth;
 float rX, rY, rZ, tX, tY, tZ, s;
 float time;
 GLfloat fAspect;
@@ -41,41 +41,41 @@ void inicializar() {
 
 /*-------------------------------------------Pontos de controle-----------------------------------------*/
 
-                             
+
 GLfloat ctrlpointsinterno1[4][4][3] = {
 				  {{-4,3,0}, {-4,3,0}, {4,3,0}, {4,3,0}},
 				  { { -8,4,0 }, { -4,4, 3 }, {4,4,    3 }, { 8,4,0 } },
 				  { { -8,-4,0}, {  -4,-4,  3 }, { 4,-4,   3 }, {8,-4,0 } },
-				  { {-10,-6,-4 }, {-6,-4,0 }, {6,-4,0 }, { 10,-6,-4}} 
+				  { {-10,-6,-4 }, {-6,-4,0 }, {6,-4,0 }, { 10,-6,-4}}
 
 };
 GLfloat ctrlpointsinterno2[4][4][3] = {
 				  {{-6,4,0}, {-6,4,0}, {6,4,0}, {6,4,0}},
 				  { { -6,4,0 }, { -4,4, 2 }, {4,4,    2 }, { 6,4,0 } },
 				  { { -6,-4,0}, {  -4,-4,  2 }, { 4,-4,   2 }, {6,-4,0 } },
-				  { {-8,-4,-4 }, {-6,-4,0 }, {6,-4,0 }, {8,-4,-4}} 
+				  { {-8,-4,-4 }, {-6,-4,0 }, {6,-4,0 }, {8,-4,-4}}
 
 };
 GLfloat ctrlpointsporta[4][4][3] = {
 				  {{-4,3,0}, {-4,3,0}, {4,3,0}, {4,3,0}},
 				  { { -8,4,0 }, { -4,4, -3 }, {4,4,    -3 }, { 6,4,0 } },
 				  { { -8,-4,0}, {  -4,-4,  -3 }, { 4,-4,   -3 }, {6,-4,0 } },
-				  { {-8,-6,0 }, {-4,-6,0 }, { 4,-6,0 }, { 6,-6,0}} 
+				  { {-8,-6,0 }, {-4,-6,0 }, { 4,-6,0 }, { 6,-6,0}}
 
 };
 GLfloat ctrlpointslateralesquerda[4][4][3] = {
 				  {{-4,3,3}, {-4,3,0}, {4,3,0}, {7,3,1}},
 				  { { -5,4,3 }, { -4,4, -1 }, {4,4,    -1 }, { 7,4,0 } },
 				  { { -9,-5,4}, {  -4,-4,  -1 }, { 4,-4,   -1 }, {7,-4,0 } },
-				  { {-12.5,-5.5,4 }, {-4,-6,-6 }, { 4,-6,0 }, {10,-6,0}} 
+				  { {-12.5,-5.5,4 }, {-4,-6,-6 }, { 4,-6,0 }, {10,-6,0}}
 
 };
-	
-GLfloat ctrlpointslateraldireita[4][4][3] = {					
+
+GLfloat ctrlpointslateraldireita[4][4][3] = {
 				  {{-7,-3,-1}, {-4,-3,0}, {4,-3,0}, {4,-3,-3}},
 				  { {  -7,-4,0 }, { -4,-4,    -1 }, {4,-4, -1 }, { 5,-4,-3 } },
 				  { { -7,4,0}, {  -4,4,  -1 }, { 4,4,  -1  }, {9,5,-4} },
-				  { {-10,6,0 }, {-4,6,0}, { 4,6,6 }, { 12.5,5.5,-4 }} 
+				  { {-10,6,0 }, {-4,6,0}, { 4,6,6 }, { 12.5,5.5,-4 }}
 
 };
 
@@ -83,7 +83,7 @@ GLfloat ctrlpointslateralesquerdafrente[4][4][3] = {
 				   {{-9,3,0}, {-4,3,3}, {4,3,3}, {8,-5,5}},
 				  { { -6,4,0 }, { -4,4, -5 }, {4,4,    -5 }, { 9,4,0 } },
 				  { { -9,-5,3}, {  -4,-4,  -5 }, { 4,-4,   -5 }, {9,-4,0 } },
-				  { {-12.5,-5.5,0 }, {-4,-6,-0 }, { 4,-6,3 }, {5,-6,0}} 
+				  { {-12.5,-5.5,0 }, {-4,-6,-0 }, { 4,-6,3 }, {5,-6,0}}
 };
 
 GLfloat ctrlpointslateraldireitafrente[4][4][3] = {
@@ -98,7 +98,7 @@ GLfloat ctrlpointsteto[4][4][3] = {
 				  {{-14,8,6}, {-6,10,0}, {6,10,0}, {6,9,0}},
 				  { { -8,4,2 }, { -4,4, -6 }, {4,4, -6 }, { 10,4,0 } },
 				  { { -8,-4,2}, {  -4,-4,  -6 }, { 4,-4,   -6 }, {10,-4,0 } },
-				  { {-14,-8,6 }, {-6,-10,0 }, {6,-10,0 }, { 6,-9,0}} 
+				  { {-14,-8,6 }, {-6,-10,0 }, {6,-10,0 }, { 6,-9,0}}
 
 };
 
@@ -106,7 +106,7 @@ GLfloat ctrlpointscapodianteiro[4][4][3] = {
 				  {{-12,10,0}, {-4,6,0}, {4,8,0}, {5,5,2}},
 				  { { -8,6,0 }, { -4,4, -4 }, {4,4,    -4 }, { 8,4,2 } },
 				  { { -8,-6,0}, {  -4,-4, - 4 }, { 4,-4,   -4 }, {8,-4,2 } },
-				  { {-12,-10,0 }, {-4,-6,0 }, { 4,-8,0 }, { 5,-5,2}} 
+				  { {-12,-10,0 }, {-4,-6,0 }, { 4,-8,0 }, { 5,-5,2}}
 
 };
 
@@ -114,7 +114,7 @@ GLfloat ctrlpointscapotraseiro[4][4][3] = {
 				  {{-5,5,0}, {-4,8,0}, {4,8,0}, {6,8,0}},
 				  { { -6,4,0 }, { -4,4, -4 }, {4,4,    -4 }, {6,8,0} },
 				  { { -6,-4,0}, {  -4,-4, - 4 }, { 4,-4,   -4 }, {6,-8,0} },
-				  { {-5,-5,0 }, {-4,-8,0 }, { 4,-8,0 }, { 6,-8,0}} 
+				  { {-5,-5,0 }, {-4,-8,0 }, { 4,-8,0 }, { 6,-8,0}}
 
 };
 
@@ -122,7 +122,7 @@ GLfloat ctrlpointsbase[4][4][3] = {
 				  {{-20,11,0}, {-8,12,0}, {4,12,0}, {20,10,0}},
 				  { { -28,8,0 }, { -4,4, 0 }, {4,4,    0 }, { 26,8,0 } },
 				  { { -28,-8,0}, {  -4,-4,  0 }, { 4,-4,   0 }, {26,-8,0 } },
-				  { {-20,-11,0 }, {-8,-12,0 }, { 8,-12,0 }, { 20,-10,0}} 
+				  { {-20,-11,0 }, {-8,-12,0 }, { 8,-12,0 }, { 20,-10,0}}
 
 };
 
@@ -130,7 +130,7 @@ GLfloat ctrlpointscalota[4][4][3] = {
 				  {{-2.5,3,0}, {-2,4,0}, {2,4,0}, {2.5,3,0}},
 				  { { -4,2,0 }, { -2,2, -6 }, {2,2,  -6 }, { 4,2,0 } },
 				  { { -4,-2,0}, {  -2,-2, - 6 }, { 2,-2, -6 }, {4,-2,0 } },
-				  { {-2.5,-3,0 }, {-2,-4,0 }, { 2,-4,0 }, { 2.5,-3,0}} 
+				  { {-2.5,-3,0 }, {-2,-4,0 }, { 2,-4,0 }, { 2.5,-3,0}}
 
 };
 
@@ -213,7 +213,7 @@ void Viewing(void)	{
 	glLoadIdentity();
 
 	/* Especifica posição do observador e do alvo */
-	gluLookAt(0, 20, 200, 0, 0, 0, 0, 1, 0);
+	gluLookAt(-300, 200, 30, 0, 0, 0, 0, 1, 0);
 }
 
 
@@ -249,7 +249,7 @@ void ChangeSize(GLsizei w, GLsizei h){
 void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
 
 	glPushMatrix();
-		glTranslatef(0.0,10.0,0.0);
+		glTranslatef(0.0,5.0,0.0);
 		//rodas
 		glPushMatrix();
 			glPushMatrix();
@@ -290,7 +290,7 @@ void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
 		glRotatef(90,1,0,0);
 		//base
 
-			glPushMatrix();	
+			glPushMatrix();
 				corCorrente(0.5,0.5,0.6);
 				glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4, &ctrlpointsbase[0][0][0]);
 				glMapGrid2f(22, 0.0, 1.0, 22, 0.0, 1.0);
@@ -319,7 +319,7 @@ void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
 				glRotatef(52,0,1,0);
 				glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4, &ctrlpointscapotraseiro[0][0][0]);
 				glMapGrid2f(22, 0.0, 1.0, 22, 0.0, 1.0);
-				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);	
+				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
 			glPopMatrix();
 
 		//teto
@@ -336,7 +336,7 @@ void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
 			glPushMatrix();
 				corCorrente(r, g, b);
 				glTranslatef(1,10,-3.3);
-				glRotatef(90,1,0,0);		
+				glRotatef(90,1,0,0);
 				glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4, &ctrlpointsporta[0][0][0]);
 				glMapGrid2f(22, .0, 1.0, 22, 0.0, 1.0);
 				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
@@ -347,11 +347,11 @@ void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
 				corCorrente(r, g, b);
 				glTranslatef(-1,-10,-3.3);
 				glRotatef(90,1,0,0);
-				glRotatef(180,0,1,0);			
+				glRotatef(180,0,1,0);
 				glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4, &ctrlpointsporta[0][0][0]);
 				glMapGrid2f(22, 0.0, 1.0, 22, 0.0, 1.0);
 				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
-				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);			
+				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
 			glPopMatrix();
 
 		//volante
@@ -368,20 +368,20 @@ void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
 				corCorrente(r, g, b);
 				glTranslatef(-13,-10.75,-6);
 				glRotatef(90,1,0,0);
-				glRotatef(180,1,0,0);				
+				glRotatef(180,1,0,0);
 				glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4, &ctrlpointslateralesquerda[0][0][0]);
 				glMapGrid2f(22, .0, 1.0, 22, 0.0, 1.0);
-				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22); 
+				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
 			glPopMatrix();
 			//direita
 			glPushMatrix();
 				corCorrente(r, g, b);
 				glTranslatef(-13,10.75,-6);
-				glRotatef(90,1,0,0);	
-				glRotatef(180,0,1,0);				
+				glRotatef(90,1,0,0);
+				glRotatef(180,0,1,0);
 				glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4, &ctrlpointslateraldireita[0][0][0]);
 				glMapGrid2f(22, .0, 1.0, 22, 0.0, 1.0);
-				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22); 
+				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
 			glPopMatrix();
 
 		//lateralfrente
@@ -392,7 +392,7 @@ void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
 				glRotatef(-90,1,0,0);
 				glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4,&ctrlpointslateralesquerdafrente[0][0][0]);
 				glMapGrid2f(22, .0, 1.0, 22, 0.0, 1.0);
-				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22); 			
+				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
 			glPopMatrix();
 
 			//direita
@@ -403,7 +403,7 @@ void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
 				glRotatef(180,0,1,0);
 				glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4,&ctrlpointslateraldireitafrente[0][0][0]);
 				glMapGrid2f(22, .0, 1.0, 22, 0.0, 1.0);
-				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22); 			
+				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
 
 			glPopMatrix();
 
@@ -412,13 +412,13 @@ void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
 				corCorrente(r, g, b);
 				glTranslatef(11,0,-3.5);
 				glRotatef(90,1,0,0);
-				glRotatef(90,0,1,0);	
+				glRotatef(90,0,1,0);
 				glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4, &ctrlpointsinterno1[0][0][0]);
 				glMapGrid2f(22, 0.0, 1.0, 22, 0.0, 1.0);
 				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
 			glPopMatrix();
 
-			
+
 
 		glPopMatrix();
 		//farois
@@ -434,22 +434,41 @@ void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
 			glTranslatef(22,2.5,8);
 			glutSolidSphere(2.0, 100.0, 20.0);
 		glPopMatrix();
-	
+
 	glPopMatrix();
-		
+
 }
-void pontocentral(){
+
+void desenha_pista(){
+     glColor3f(0.3,0.3,0.3);
+     glBegin(GL_POLYGON);
+        glVertex3f(300.0,0.0,-200.0);
+        glVertex3f(300,0.0,200);
+        glVertex3f(-300,0.0,200);
+        glVertex3f(-300,0.0,-200);
+     glEnd();
+}
+
+void pontocentral_pista(){
 
 	glPushMatrix();
-		corCorrente(1.0,0.0,0.0);		
+		corCorrente(1.0,0.0,0.0);
+		//glutSolidTeapot(5.0);
+		desenha_pista();
+	glPopMatrix();
+	glutPostRedisplay();
+}
+
+void pontocentral_carro(){
+
+	glPushMatrix();
+		corCorrente(1.0,0.0,0.0);
 		//glutSolidTeapot(5.0);
 		//desenha_carro(0.7,0.0,0.0);//vermelho
 		desenha_carro(0.0,0.7,0.0);//verde
 		//desenha_carro(0.0,0.0,0.7);//azul
-	glPopMatrix();	
+	glPopMatrix();
 	glutPostRedisplay();
-
-		
 }
 /*-------------------------------------------Animacao----------------------------------------------------*/
 
@@ -466,71 +485,71 @@ void timer(int i){
 
 
 void SpecialKeyboard(int key, int x, int y){
-	
+
 	switch(key){
 	case GLUT_KEY_LEFT:
-		tX-=5;
+	    if (tZ > -200) tZ-=5;
 		break;
-	
+
 	case GLUT_KEY_UP:
-		tY+=5;	
+	    if (tX < 300) tX+=5;
 		break;
 
 	case GLUT_KEY_RIGHT:
-		tX+=5;
+	    if (tZ < 200) tZ+=5;
 		break;
-		
+
 	case GLUT_KEY_DOWN:
-		tY-=5;
+	    if (tX > -300) tX-=5;
 		break;
-		
+
 	case GLUT_KEY_F1:
 		tZ+=5;
 		break;
-		
+
 	case GLUT_KEY_F2:
 		tZ-=5;
 		break;
-			
+
 	default:
 		break;
-			
+
 	}
-	
+
 }
 void keyboard(unsigned char key, int x, int y){
 	switch(key){
-		case 'x': 
-			rX += 5; 
+		case 'x':
+			rX += 5;
 			break;
-			
-		case 'X': 
-			rX -= 5; 
+
+		case 'X':
+			rX -= 5;
 			break;
-		case 'y': 
-			rY += 5; 
+		case 'y':
+			rY += 5;
 			break;
-		case 'Y': 
-			rY -= 5; 
+		case 'Y':
+			rY -= 5;
 			break;
-		case 'z': 
-			rZ += 5; 
+		case 'z':
+			rZ += 5;
 			break;
-		case 'Z': 
-			rZ -= 5; 
+		case 'Z':
+			rZ -= 5;
 			break;
-		case '+': 
-			if(s<4.0)	
-				s += 0.5; 
+		case '+':
+			if(s<4.0)
+				s += 0.5;
 			break;
-		case '-': 
-			if(s>0.5)	
-				s -= 0.5; 
+		case '-':
+			if(s>0.5)
+				s -= 0.5;
 			break;
 		case 27:
-			exit(0); 
+			exit(0);
 			break;
-    	default: 
+    	default:
 			break;
 	}
 }
@@ -542,16 +561,24 @@ void display(){
 	glEnable(GL_DEPTH_TEST);
 
 	glPushMatrix();
-		glTranslatef(tX, 1.0, 0.0);
-	  	glTranslatef(0.0, tY, 0.0);
-		glTranslatef(0.0, 0.0, tZ);
-	 	glScalef(s,s,s);
+        glScalef(s,s,s);
 		glRotatef(rX, 1.0, 0.0, 0.0);
 	  	glRotatef(rY, 0.0, 1.0, 0.0);
 	  	glRotatef(rZ, 0.0, 0.0, 1.0);
-	  	pontocentral();	
-	glPopMatrix();
-	
+	  	pontocentral_pista();
+    glPopMatrix();
+
+    glPushMatrix();
+        glRotatef(rX, 1.0, 0.0, 0.0);
+	  	glRotatef(rY, 0.0, 1.0, 0.0);
+	  	glRotatef(rZ, 0.0, 0.0, 1.0);
+        glTranslatef(tX, 1.0, 0.0);
+	  	//glTranslatef(0.0, tY, 0.0);
+		glTranslatef(0.0, 0.0, tZ);
+	 	glScalef(s,s,s);
+	 	pontocentral_carro();
+    glPopMatrix();
+
 	glutSwapBuffers();
 }
 /*-----------------------------------------------Main-------------------------------------------------*/
