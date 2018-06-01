@@ -1,6 +1,6 @@
 /*
-Computação Gráfica - Projeto Final - main
-Versão: 1.5
+ComputaÃƒÂ§ÃƒÂ£o GrÃƒÂ¡fica - Projeto Final - main
+Versao: 1.6
 */
 
 #include <GL/glut.h>
@@ -26,7 +26,7 @@ float quantidadeArvore = 15;
 /*-------------------------------------------Variaveis de Inicializacao---------------------------------*/
 
 void inicializar() {
-  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+  glClearColor(0.5f, 0.3f, 1.0f, 1.0f);
   time = 1.0;
   rX_Carro = 0.0;
   rY_Carro = 0.0;
@@ -47,7 +47,7 @@ void inicializar() {
   s = 1.0;
   angle = 45;
   glMatrixMode(GL_PROJECTION);
-  //glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+ // glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
   glLoadIdentity();
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_AUTO_NORMAL);
@@ -174,13 +174,14 @@ void SetupRC(void) {
     GLfloat especularidade[4]={1.0, 1.0, 1.0, 1.0};
     GLint especMaterial = 20;
 
-/* Especifica que a cor de fundo da janela será branca */
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+/* Especifica que a cor de fundo da janela serÃƒÂ¡ azul clara */
+     glClearColor(0.3f, 0.8f, 1.0f, 1.0f);
+
 
 /* Ativa o uso da luz ambiente */
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
 
-/* Define os parâmetros da luz de número 0 */
+/* Define os parÃ¢metros da luz de nÃºmero 0 */
     glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa);
     glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular);
@@ -194,16 +195,16 @@ void SetupRC(void) {
 /* define as propriedades do material */
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, objeto_ambiente);
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, objeto_difusa);
-/* Define a refletância do material */
+/* Define a refletÃ¢ncia do material */
     glMaterialfv(GL_FRONT, GL_SPECULAR, especularidade);
-/* Define a concentração do brilho */
+/* Define a concentraÃ§Ã£o do brilho */
     glMateriali(GL_FRONT, GL_SHININESS, especMaterial);
 
-/* Habilita a definição da cor do material a partir da cor corrente */
+/* Habilita a definiÃ§Ã£o da cor do material a partir da cor corrente */
     glEnable(GL_COLOR_MATERIAL);
-/* Habilita o uso de iluminação*/
+/* Habilita o uso de iluminaÃ§Ã£o*/
     glEnable(GL_LIGHTING);
-/* Habilita a luz de número 0 */
+/* Habilita a luz de nÃºmero 0 */
     glEnable(GL_LIGHT0);
 /* Habilita o depth-buffering */
     glEnable(GL_DEPTH_TEST);
@@ -214,32 +215,33 @@ void SetupRC(void) {
 /*-------------------------------------------Visualizacao-------------------------------------------------*/
 
 
-/* Função usada para especificar o volume de visualização */
+/* FunÃ§Ã£o usada para especificar o volume de visualizaÃ§Ã£o */
 void Viewing(void)	{
-	/* Especifica sistema de coordenadas de projeção */
+	/* Especifica sistema de coordenadas de projeÃ§Ã£o */
 	glMatrixMode(GL_PROJECTION);
-	/* Inicializa sistema de coordenadas de projeção */
+	/* Inicializa sistema de coordenadas de projeÃ§Ã£o */
 	glLoadIdentity();
 
-	/* Especifica a projeção perspectiva */
+	/* Especifica a projeÃ§Ã£o perspectiva */
 	gluPerspective(angle, fAspect, 0.1, 1000);
 
 	/* Especifica sistema de coordenadas do modelo */
 	glMatrixMode(GL_MODELVIEW);
-	/* Inicializa sistema de coordenadas de projeção */
+	/* Inicializa sistema de coordenadas de projeÃ§Ã£o */
 	glLoadIdentity();
 
-	/* Especifica posição do observador e do alvo */
-	gluLookAt(-300, 300, 0, 0, 0, 0, 0, 1, 0);
+	/* Especifica posiÃƒÂ§ÃƒÂ£o do observador e do alvo */
+	gluLookAt(-550, 400, 0, 0, 0, 0, 0, 1, 0);
+
 }
 
 
 /*-------------------------------------------Redimensionamento--------------------------------------------*/
 
 
-/* Chamada pela GLUT quando a janela é redimensionada */
+/* Chamada pela GLUT quando a janela Ã© redimensionada */
 void ChangeSize(GLsizei w, GLsizei h){
-	/* Para previnir uma divisão por zero */
+	/* Para previnir uma divisÃ£o por zero */
 	if(h == 0) h = 1;
 
 	if(w <= h){
@@ -254,13 +256,13 @@ void ChangeSize(GLsizei w, GLsizei h){
 	/* Especifica o tamanho da viewport */
 	glViewport(0, 0, w, h);
 
-	/* Calcula a correção de aspecto */
+	/* Calcula a correÃ§Ã£o de aspecto */
 	fAspect = (GLfloat)w / (GLfloat)h;
 
 	Viewing();
 }
 
-/*-------------------------------------------Funçoes de Desenho--------------------------------------------*/
+/*-------------------------------------------FunÃ§oes de Desenho--------------------------------------------*/
 
 
 void carro(GLfloat r, GLfloat g, GLfloat b){
@@ -313,7 +315,7 @@ void carro(GLfloat r, GLfloat g, GLfloat b){
 				glMapGrid2f(22, 0.0, 1.0, 22, 0.0, 1.0);
 				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
 				glTranslatef(0,0,-0.5);
-				corCorrente(0.2, 0.2, 0.2);
+				corCorrente(0.0, 0.0, 0.0);
 				glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4, &ctrlpointsbase[0][0][0]);
 				glMapGrid2f(22, 0.0, 1.0, 22, 0.0, 1.0);
 				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
@@ -459,7 +461,7 @@ void arvore(GLfloat x, GLfloat z){
     //arvore
         glPushMatrix();
              glTranslatef(arvoreX,15,arvoreZ);//Deixar com a base mais rente ao plano do jogo, portanto subir 15 unidades em Y
-             glScaled(5,5,5);//Deixar mais proporcional ao Cenário
+             glScaled(5,5,5);//Deixar mais proporcional ao CenÃ¡rio
 
             //tronco
             glColor3f(0.24,0.11,0.0);
@@ -520,13 +522,14 @@ void pista(){
 }
 
 void desenha_Cenario(){
-	int i, x1,x2, z;
+	int i, x1,x2, z,z2,z3,z4;
 	glPushMatrix();
 		pista();
 		mato();
 		x1 = 300;
 		x2 = 277;
-		z = -380;// Mato Lado Esquerdo
+		z = -380;
+		// Mato Lado Esquerdo
 		for(i=0; i<quantidadeArvore; i++){
 			x1 = x1-55;
 			x2 = x2-55;
@@ -538,11 +541,12 @@ void desenha_Cenario(){
 			arvore(x1,z+80);
 
 			arvore(x2,z+120);
-		//implementar aqui o incremento de x e z para desenhar as arvores dentro do mato
+		
 		}
 		x1 = 300;
 		x2 = 277;
-		z = 380; // Mato Lado Direito
+		z = 380; 
+		// Mato Lado Direito
 		for(i=0; i<quantidadeArvore; i++){
 			x1 = x1-55;
 			x2 = x2-55;
@@ -554,7 +558,7 @@ void desenha_Cenario(){
 			arvore(x1,z-80);
 
 			arvore(x2,z-120);
-		//implementar aqui o incremento de x e z para desenhar as arvores dentro do mato
+		
 		}
 
 	glPopMatrix();
@@ -565,9 +569,9 @@ void desenha_Carros(){
 
 	glPushMatrix();
 		corCorrente(1.0,0.0,0.0);
-		//desenha_carro(0.7,0.0,0.0);//vermelho
-		carro(0.0,0.7,0.0);//verde
-		//desenha_carro(0.0,0.0,0.7);//azul
+		carro(0.7,0.0,0.0);//vermelho
+		//carro(0.0,0.7,0.0);//verde
+		//carro(0.0,0.0,0.7);//azul
 	glPopMatrix();
 	glutPostRedisplay();
 }
