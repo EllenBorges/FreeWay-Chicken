@@ -1,6 +1,6 @@
 /*
-Computação Gráfica - Projeto Final - main
-Versão: 1.6
+ComputaÃ§Ã£o GrÃ¡fica - Projeto Final - main
+Versao: 1.6
 */
 
 #include <GL/glut.h>
@@ -174,8 +174,9 @@ void SetupRC(void) {
     GLfloat especularidade[4]={1.0, 1.0, 1.0, 1.0};
     GLint especMaterial = 20;
 
-/* Especifica que a cor de fundo da janela será azul clara */
+/* Especifica que a cor de fundo da janela serÃ¡ azul clara */
      glClearColor(0.3f, 0.8f, 1.0f, 1.0f);
+
 
 /* Ativa o uso da luz ambiente */
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
@@ -229,8 +230,9 @@ void Viewing(void)	{
 	/* Inicializa sistema de coordenadas de projeção */
 	glLoadIdentity();
 
-	/* Especifica posição do observador e do alvo */
+	/* Especifica posiÃ§Ã£o do observador e do alvo */
 	gluLookAt(-550, 400, 0, 0, 0, 0, 0, 1, 0);
+
 }
 
 
