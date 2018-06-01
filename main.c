@@ -1,6 +1,6 @@
 /*
 Computação Gráfica - Projeto Final - main
-Versão: 1.3
+Versão: 1.2
 */
 
 #include <GL/glut.h>
@@ -21,7 +21,7 @@ float tX_Cenario,tY_Cenario, tZ_Cenario;
 float time;
 GLfloat fAspect;
 
-
+float quantidadeArvore;
 
 /*-------------------------------------------Variaveis de Inicializacao---------------------------------*/
 
@@ -53,6 +53,7 @@ void inicializar() {
   glEnable(GL_AUTO_NORMAL);
   glEnable(GL_NORMALIZE);
   glEnable(GL_MAP2_VERTEX_3);
+  quantidadeArvore = 10.0;
 }
 
 /*-------------------------------------------Pontos de controle-----------------------------------------*/
@@ -452,9 +453,64 @@ void carro(GLfloat r, GLfloat g, GLfloat b){
 	glPopMatrix();
 
 }
+void arvore(GLfloat x, GLfloat z){
+    GLfloat arvoreX = x;
+    GLfloat arvoreZ = z;
+    //arvore
+        glPushMatrix();
+             glTranslatef(arvoreX,15,arvoreZ);//Deixar com a base mais rente ao plano do jogo, portanto subir 15 unidades em Y
+             glScaled(5,5,5);//Deixar mais proporcional ao Cenário
+
+            //tronco
+            glColor3f(0.24,0.11,0.0);
+            glColor3f(0.117,0.0549,0.0235);
+            glPushMatrix();
+                 glTranslatef(0,2,0);
+                 glRotatef(90,0.5,0,0);
+                 GLUquadric* qobj = gluNewQuadric();
+                   gluQuadricNormals(qobj, GLU_SMOOTH);
+                 gluCylinder(qobj,0.5, 1.5, 5,50, 10);
+            glPopMatrix();
+            //folhas
+            glColor3f(0.0,0.086,0.058);
+            glPushMatrix();
+                glTranslatef(0,2,0);
+                glRotatef(-90,1,0,0);
+                glutSolidCone(2, 5,50, 10);
+                glTranslatef(0,0,1);
+                glutSolidCone(2, 5,50, 10);
+                glTranslatef(0,0,1);
+                glutSolidCone(2, 5,50, 10);
+            glPopMatrix();
+        glPopMatrix();
+    glutPostRedisplay();
+}
+
+void mato(){
+     corCorrente(0.0,0.3,0.0);
+	 
+	 //esquerda
+     glBegin(GL_POLYGON);
+        glVertex3f(300.0,0.0,-400.0);
+        glVertex3f(300,0.0,-200);
+        glVertex3f(-300,0.0,-200);
+        glVertex3f(-300,0.0,-400);
+     glEnd();
+	 
+	 //direita
+	 
+	 glBegin(GL_POLYGON);
+        glVertex3f(-300.0,0.0,400.0);
+        glVertex3f(-300,0.0,200);
+        glVertex3f(300,0.0,200);
+        glVertex3f(300,0.0,400);
+     glEnd();
+	 
+}
+
 
 void pista(){
-     glColor3f(0.3,0.3,0.3);
+     corCorrente(0.3,0.3,0.3);
      glBegin(GL_POLYGON);
         glVertex3f(300.0,0.0,-200.0);
         glVertex3f(300,0.0,200);
@@ -464,10 +520,17 @@ void pista(){
 }
 
 void desenha_Cenario(){
-
+	int i, x, z;
 	glPushMatrix();
-		corCorrente(1.0,0.0,0.0);
 		pista();
+		mato();
+		x = 0;
+		z = 0;
+		for(i=0; i<quantidadeArvore; i++){
+			arvore(x,z);
+		//implementar aqui o incremento de x e z para desenhar as arvores dentro do mato
+		}
+		
 	glPopMatrix();
 	glutPostRedisplay();
 }
@@ -637,3 +700,4 @@ int main(int argc, char* argv[]){
 
   return 0;
 }
+
