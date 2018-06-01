@@ -520,7 +520,7 @@ void pista(){
 }
 
 void desenha_Cenario(){
-	int i, x1,x2, z;
+	int i, x1,x2, z,z2,z3,z4;
 	glPushMatrix();
 		pista();
 		mato();
