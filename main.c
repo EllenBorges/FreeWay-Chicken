@@ -11,7 +11,13 @@ Versão: 1.2
 
 GLfloat angle;
 int width, heigth;
-float rX, rY, rZ, tX, tY, tZ, s;
+float s,s_Carro,s_Cenario;
+
+float rX_Carro, rY_Carro, rZ_Carro;
+float rX_Cenario, rY_Cenario, rZ_Cenario;
+
+float tX_Carro,tY_Carro, tZ_Carro;
+float tX_Cenario,tY_Cenario, tZ_Cenario;
 float time;
 GLfloat fAspect;
 
@@ -22,12 +28,22 @@ GLfloat fAspect;
 void inicializar() {
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   time = 1.0;
-  rX = 0.0;
-  rY = 0.0;
-  rZ = 0.0;
-  tX = 0.0;
-  tY = 0.0;
-  tZ = 0.0;
+  rX_Carro = 0.0;
+  rY_Carro = 0.0;
+  rZ_Carro = 0.0;
+  tX_Carro = 0.0;
+  tY_Carro = 0.0;
+  tZ_Carro = 0.0;
+  
+  rX_Cenario = 0.0;
+  rY_Cenario = 0.0;
+  rZ_Cenario = 0.0;
+  tX_Cenario = 0.0;
+  tY_Cenario = 0.0;
+  tZ_Cenario = 0.0;
+  
+  s_Carro = 1.0;
+  s_Cenario = 1.0;
   s = 1.0;
   angle = 45;
   glMatrixMode(GL_PROJECTION);
@@ -213,7 +229,7 @@ void Viewing(void)	{
 	glLoadIdentity();
 
 	/* Especifica posição do observador e do alvo */
-	gluLookAt(-300, 200, 30, 0, 0, 0, 0, 1, 0);
+	gluLookAt(-300, 300, 0, 0, 0, 0, 0, 1, 0);
 }
 
 
@@ -246,7 +262,7 @@ void ChangeSize(GLsizei w, GLsizei h){
 /*-------------------------------------------Funçoes de Desenho--------------------------------------------*/
 
 
-void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
+void carro(GLfloat r, GLfloat g, GLfloat b){
 
 	glPushMatrix();
 		glTranslatef(0.0,5.0,0.0);
@@ -418,8 +434,6 @@ void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
 				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
 			glPopMatrix();
 
-
-
 		glPopMatrix();
 		//farois
 		//esquerdo
@@ -439,7 +453,7 @@ void desenha_carro(GLfloat r, GLfloat g, GLfloat b){
 
 }
 
-void desenha_pista(){
+void pista(){
      glColor3f(0.3,0.3,0.3);
      glBegin(GL_POLYGON);
         glVertex3f(300.0,0.0,-200.0);
@@ -449,23 +463,21 @@ void desenha_pista(){
      glEnd();
 }
 
-void pontocentral_pista(){
+void desenha_Cenario(){
 
 	glPushMatrix();
 		corCorrente(1.0,0.0,0.0);
-		//glutSolidTeapot(5.0);
-		desenha_pista();
+		pista();
 	glPopMatrix();
 	glutPostRedisplay();
 }
 
-void pontocentral_carro(){
+void desenha_Carros(){
 
 	glPushMatrix();
 		corCorrente(1.0,0.0,0.0);
-		//glutSolidTeapot(5.0);
 		//desenha_carro(0.7,0.0,0.0);//vermelho
-		desenha_carro(0.0,0.7,0.0);//verde
+		carro(0.0,0.7,0.0);//verde
 		//desenha_carro(0.0,0.0,0.7);//azul
 	glPopMatrix();
 	glutPostRedisplay();
@@ -488,27 +500,42 @@ void SpecialKeyboard(int key, int x, int y){
 
 	switch(key){
 	case GLUT_KEY_LEFT:
-	    if (tZ > -200) tZ-=5;
+	    if (tZ_Carro > -200) tZ_Carro-=5;
 		break;
 
 	case GLUT_KEY_UP:
-	    if (tX < 300) tX+=5;
+	    if (tX_Carro < 300) tX_Carro+=5;
 		break;
 
 	case GLUT_KEY_RIGHT:
-	    if (tZ < 200) tZ+=5;
+	    if (tZ_Carro < 200) tZ_Carro+=5;
 		break;
 
 	case GLUT_KEY_DOWN:
-	    if (tX > -300) tX-=5;
+	    if (tX_Carro > -300) tX_Carro-=5;
 		break;
 
 	case GLUT_KEY_F1:
-		tZ+=5;
+		tX_Cenario+=5;
 		break;
 
 	case GLUT_KEY_F2:
-		tZ-=5;
+		tX_Cenario-=5;
+		break;
+	case GLUT_KEY_F3:
+		tY_Cenario+=5;
+		break;
+
+	case GLUT_KEY_F4:
+		tY_Cenario-=5;
+		break;
+		
+	case GLUT_KEY_F5:
+		tZ_Cenario+=5;
+		break;
+
+	case GLUT_KEY_F6:
+		tZ_Cenario-=5;
 		break;
 
 	default:
@@ -520,23 +547,23 @@ void SpecialKeyboard(int key, int x, int y){
 void keyboard(unsigned char key, int x, int y){
 	switch(key){
 		case 'x':
-			rX += 5;
+			rX_Carro += 5;
 			break;
 
 		case 'X':
-			rX -= 5;
+			rX_Carro -= 5;
 			break;
 		case 'y':
-			rY += 5;
+			rY_Carro += 5;
 			break;
 		case 'Y':
-			rY -= 5;
+			rY_Carro -= 5;
 			break;
 		case 'z':
-			rZ += 5;
+			rZ_Carro += 5;
 			break;
 		case 'Z':
-			rZ -= 5;
+			rZ_Carro -= 5;
 			break;
 		case '+':
 			if(s<4.0)
@@ -559,25 +586,34 @@ void keyboard(unsigned char key, int x, int y){
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-
+	
 	glPushMatrix();
-        glScalef(s,s,s);
-		glRotatef(rX, 1.0, 0.0, 0.0);
-	  	glRotatef(rY, 0.0, 1.0, 0.0);
-	  	glRotatef(rZ, 0.0, 0.0, 1.0);
-	  	pontocentral_pista();
-    glPopMatrix();
+	
+		glScalef(s,s,s);//zoom in out
 
-    glPushMatrix();
-        glRotatef(rX, 1.0, 0.0, 0.0);
-	  	glRotatef(rY, 0.0, 1.0, 0.0);
-	  	glRotatef(rZ, 0.0, 0.0, 1.0);
-        glTranslatef(tX, 1.0, 0.0);
-	  	//glTranslatef(0.0, tY, 0.0);
-		glTranslatef(0.0, 0.0, tZ);
-	 	glScalef(s,s,s);
-	 	pontocentral_carro();
-    glPopMatrix();
+		glPushMatrix();
+			glTranslatef(tX_Cenario, 0.0, 0.0);
+			glTranslatef(0.0, tY_Cenario, 0.0);
+			glTranslatef(0.0, 0.0, tZ_Cenario);
+			glScalef(s_Cenario,s_Cenario,s_Cenario);
+			glRotatef(rX_Cenario, 1.0, 0.0, 0.0);
+			glRotatef(rY_Cenario, 0.0, 1.0, 0.0);
+			glRotatef(rZ_Cenario, 0.0, 0.0, 1.0);
+			desenha_Cenario();
+		glPopMatrix();
+
+		glPushMatrix();   
+			glTranslatef(tX_Carro, 0.0, 0.0);
+			glTranslatef(0.0, tY_Carro, 0.0);
+			glTranslatef(0.0, 0.0, tZ_Carro);
+			glScalef(s_Carro,s_Carro,s_Carro);
+			glRotatef(rX_Carro, 1.0, 0.0, 0.0);
+			glRotatef(rY_Carro, 0.0, 1.0, 0.0);
+			glRotatef(rZ_Carro, 0.0, 0.0, 1.0);
+			desenha_Carros();
+		glPopMatrix();
+	
+	glPopMatrix();
 
 	glutSwapBuffers();
 }
