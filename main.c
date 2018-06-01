@@ -1,6 +1,6 @@
 /*
 Computação Gráfica - Projeto Final - main
-Versão: 1.5
+Versão: 1.6
 */
 
 #include <GL/glut.h>
