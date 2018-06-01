@@ -1,6 +1,6 @@
 /*
 Computação Gráfica - Projeto Final - main
-Versão: 1.4
+Versão: 1.5
 */
 
 #include <GL/glut.h>
@@ -21,12 +21,12 @@ float tX_Cenario,tY_Cenario, tZ_Cenario;
 float time;
 GLfloat fAspect;
 
-float quantidadeArvore;
+float quantidadeArvore = 15;
 
 /*-------------------------------------------Variaveis de Inicializacao---------------------------------*/
 
 void inicializar() {
-  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+  glClearColor(0.5f, 0.3f, 1.0f, 1.0f);
   time = 1.0;
   rX_Carro = 0.0;
   rY_Carro = 0.0;
@@ -34,20 +34,20 @@ void inicializar() {
   tX_Carro = 0.0;
   tY_Carro = 0.0;
   tZ_Carro = 0.0;
-  
+
   rX_Cenario = 0.0;
   rY_Cenario = 0.0;
   rZ_Cenario = 0.0;
   tX_Cenario = 0.0;
   tY_Cenario = 0.0;
   tZ_Cenario = 0.0;
-  
+
   s_Carro = 1.0;
   s_Cenario = 1.0;
   s = 1.0;
   angle = 45;
   glMatrixMode(GL_PROJECTION);
-  //glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+ // glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
   glLoadIdentity();
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_AUTO_NORMAL);
@@ -174,8 +174,8 @@ void SetupRC(void) {
     GLfloat especularidade[4]={1.0, 1.0, 1.0, 1.0};
     GLint especMaterial = 20;
 
-/* Especifica que a cor de fundo da janela será branca */
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+/* Especifica que a cor de fundo da janela será azul clara */
+     glClearColor(0.3f, 0.8f, 1.0f, 1.0f);
 
 /* Ativa o uso da luz ambiente */
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
@@ -230,7 +230,7 @@ void Viewing(void)	{
 	glLoadIdentity();
 
 	/* Especifica posição do observador e do alvo */
-	gluLookAt(-300, 300, 0, 0, 0, 0, 0, 1, 0);
+	gluLookAt(-550, 400, 0, 0, 0, 0, 0, 1, 0);
 }
 
 
@@ -313,7 +313,7 @@ void carro(GLfloat r, GLfloat g, GLfloat b){
 				glMapGrid2f(22, 0.0, 1.0, 22, 0.0, 1.0);
 				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
 				glTranslatef(0,0,-0.5);
-				corCorrente(0.2, 0.2, 0.2);
+				corCorrente(0.0, 0.0, 0.0);
 				glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 4, 0.0, 1.0, 12, 4, &ctrlpointsbase[0][0][0]);
 				glMapGrid2f(22, 0.0, 1.0, 22, 0.0, 1.0);
 				glEvalMesh2(GL_FILL, 0.0, 22, 0.0, 22);
@@ -488,7 +488,7 @@ void arvore(GLfloat x, GLfloat z){
 
 void mato(){
      corCorrente(0.0,0.3,0.0);
-	 
+
 	 //esquerda
      glBegin(GL_POLYGON);
         glVertex3f(300.0,0.0,-400.0);
@@ -496,16 +496,16 @@ void mato(){
         glVertex3f(-300,0.0,-200);
         glVertex3f(-300,0.0,-400);
      glEnd();
-	 
+
 	 //direita
-	 
+
 	 glBegin(GL_POLYGON);
         glVertex3f(-300.0,0.0,400.0);
         glVertex3f(-300,0.0,200);
         glVertex3f(300,0.0,200);
         glVertex3f(300,0.0,400);
      glEnd();
-	 
+
 }
 
 
@@ -520,17 +520,45 @@ void pista(){
 }
 
 void desenha_Cenario(){
-	int i, x, z;
+	int i, x1,x2, z,z2,z3,z4;
 	glPushMatrix();
 		pista();
 		mato();
-		x = 0;
-		z = 0;
+		x1 = 300;
+		x2 = 277;
+		z = -380;
+		// Mato Lado Esquerdo
 		for(i=0; i<quantidadeArvore; i++){
-			arvore(x,z);
-		//implementar aqui o incremento de x e z para desenhar as arvores dentro do mato
-		}
+			x1 = x1-55;
+			x2 = x2-55;
+
+			arvore(x1,z);
+
+			arvore(x2,z+40);
+
+			arvore(x1,z+80);
+
+			arvore(x2,z+120);
 		
+		}
+		x1 = 300;
+		x2 = 277;
+		z = 380; 
+		// Mato Lado Direito
+		for(i=0; i<quantidadeArvore; i++){
+			x1 = x1-55;
+			x2 = x2-55;
+
+			arvore(x1,z);
+
+			arvore(x2,z-40);
+
+			arvore(x1,z-80);
+
+			arvore(x2,z-120);
+		
+		}
+
 	glPopMatrix();
 	glutPostRedisplay();
 }
@@ -539,9 +567,9 @@ void desenha_Carros(){
 
 	glPushMatrix();
 		corCorrente(1.0,0.0,0.0);
-		//desenha_carro(0.7,0.0,0.0);//vermelho
-		carro(0.0,0.7,0.0);//verde
-		//desenha_carro(0.0,0.0,0.7);//azul
+		carro(0.7,0.0,0.0);//vermelho
+		//carro(0.0,0.7,0.0);//verde
+		//carro(0.0,0.0,0.7);//azul
 	glPopMatrix();
 	glutPostRedisplay();
 }
@@ -592,7 +620,7 @@ void SpecialKeyboard(int key, int x, int y){
 	case GLUT_KEY_F4:
 		tY_Cenario-=5;
 		break;
-		
+
 	case GLUT_KEY_F5:
 		tZ_Cenario+=5;
 		break;
@@ -649,9 +677,9 @@ void keyboard(unsigned char key, int x, int y){
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-	
+
 	glPushMatrix();
-	
+
 		glScalef(s,s,s);//zoom in out
 
 		glPushMatrix();
@@ -665,7 +693,7 @@ void display(){
 			desenha_Cenario();
 		glPopMatrix();
 
-		glPushMatrix();   
+		glPushMatrix();
 			glTranslatef(tX_Carro, 0.0, 0.0);
 			glTranslatef(0.0, tY_Carro, 0.0);
 			glTranslatef(0.0, 0.0, tZ_Carro);
@@ -675,7 +703,7 @@ void display(){
 			glRotatef(rZ_Carro, 0.0, 0.0, 1.0);
 			desenha_Carros();
 		glPopMatrix();
-	
+
 	glPopMatrix();
 
 	glutSwapBuffers();
