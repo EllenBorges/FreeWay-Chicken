@@ -1,6 +1,6 @@
 /*
-Computa√ß√£o Gr√°fica - Projeto Final - main
-Vers√£o: 1.4
+ComputaÁ„o Gr·fica - Projeto Final - main
+Vers„o: 1.5
 */
 
 #include <GL/glut.h>
@@ -21,7 +21,7 @@ float tX_Cenario,tY_Cenario, tZ_Cenario;
 float time;
 GLfloat fAspect;
 
-float quantidadeArvore;
+float quantidadeArvore = 15;
 
 /*-------------------------------------------Variaveis de Inicializacao---------------------------------*/
 
@@ -34,14 +34,14 @@ void inicializar() {
   tX_Carro = 0.0;
   tY_Carro = 0.0;
   tZ_Carro = 0.0;
-  
+
   rX_Cenario = 0.0;
   rY_Cenario = 0.0;
   rZ_Cenario = 0.0;
   tX_Cenario = 0.0;
   tY_Cenario = 0.0;
   tZ_Cenario = 0.0;
-  
+
   s_Carro = 1.0;
   s_Cenario = 1.0;
   s = 1.0;
@@ -174,13 +174,13 @@ void SetupRC(void) {
     GLfloat especularidade[4]={1.0, 1.0, 1.0, 1.0};
     GLint especMaterial = 20;
 
-/* Especifica que a cor de fundo da janela ser√° branca */
+/* Especifica que a cor de fundo da janela ser· branca */
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 /* Ativa o uso da luz ambiente */
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
 
-/* Define os par√¢metros da luz de n√∫mero 0 */
+/* Define os par‚metros da luz de n˙mero 0 */
     glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa);
     glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular);
@@ -194,16 +194,16 @@ void SetupRC(void) {
 /* define as propriedades do material */
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, objeto_ambiente);
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, objeto_difusa);
-/* Define a reflet√¢ncia do material */
+/* Define a reflet‚ncia do material */
     glMaterialfv(GL_FRONT, GL_SPECULAR, especularidade);
-/* Define a concentra√ß√£o do brilho */
+/* Define a concentraÁ„o do brilho */
     glMateriali(GL_FRONT, GL_SHININESS, especMaterial);
 
-/* Habilita a defini√ß√£o da cor do material a partir da cor corrente */
+/* Habilita a definiÁ„o da cor do material a partir da cor corrente */
     glEnable(GL_COLOR_MATERIAL);
-/* Habilita o uso de ilumina√ß√£o*/
+/* Habilita o uso de iluminaÁ„o*/
     glEnable(GL_LIGHTING);
-/* Habilita a luz de n√∫mero 0 */
+/* Habilita a luz de n˙mero 0 */
     glEnable(GL_LIGHT0);
 /* Habilita o depth-buffering */
     glEnable(GL_DEPTH_TEST);
@@ -214,22 +214,22 @@ void SetupRC(void) {
 /*-------------------------------------------Visualizacao-------------------------------------------------*/
 
 
-/* Fun√ß√£o usada para especificar o volume de visualiza√ß√£o */
+/* FunÁ„o usada para especificar o volume de visualizaÁ„o */
 void Viewing(void)	{
-	/* Especifica sistema de coordenadas de proje√ß√£o */
+	/* Especifica sistema de coordenadas de projeÁ„o */
 	glMatrixMode(GL_PROJECTION);
-	/* Inicializa sistema de coordenadas de proje√ß√£o */
+	/* Inicializa sistema de coordenadas de projeÁ„o */
 	glLoadIdentity();
 
-	/* Especifica a proje√ß√£o perspectiva */
+	/* Especifica a projeÁ„o perspectiva */
 	gluPerspective(angle, fAspect, 0.1, 1000);
 
 	/* Especifica sistema de coordenadas do modelo */
 	glMatrixMode(GL_MODELVIEW);
-	/* Inicializa sistema de coordenadas de proje√ß√£o */
+	/* Inicializa sistema de coordenadas de projeÁ„o */
 	glLoadIdentity();
 
-	/* Especifica posi√ß√£o do observador e do alvo */
+	/* Especifica posiÁ„o do observador e do alvo */
 	gluLookAt(-300, 300, 0, 0, 0, 0, 0, 1, 0);
 }
 
@@ -237,9 +237,9 @@ void Viewing(void)	{
 /*-------------------------------------------Redimensionamento--------------------------------------------*/
 
 
-/* Chamada pela GLUT quando a janela √© redimensionada */
+/* Chamada pela GLUT quando a janela È redimensionada */
 void ChangeSize(GLsizei w, GLsizei h){
-	/* Para previnir uma divis√£o por zero */
+	/* Para previnir uma divis„o por zero */
 	if(h == 0) h = 1;
 
 	if(w <= h){
@@ -254,13 +254,13 @@ void ChangeSize(GLsizei w, GLsizei h){
 	/* Especifica o tamanho da viewport */
 	glViewport(0, 0, w, h);
 
-	/* Calcula a corre√ß√£o de aspecto */
+	/* Calcula a correÁ„o de aspecto */
 	fAspect = (GLfloat)w / (GLfloat)h;
 
 	Viewing();
 }
 
-/*-------------------------------------------Fun√ßoes de Desenho--------------------------------------------*/
+/*-------------------------------------------FunÁoes de Desenho--------------------------------------------*/
 
 
 void carro(GLfloat r, GLfloat g, GLfloat b){
@@ -459,7 +459,7 @@ void arvore(GLfloat x, GLfloat z){
     //arvore
         glPushMatrix();
              glTranslatef(arvoreX,15,arvoreZ);//Deixar com a base mais rente ao plano do jogo, portanto subir 15 unidades em Y
-             glScaled(5,5,5);//Deixar mais proporcional ao Cen√°rio
+             glScaled(5,5,5);//Deixar mais proporcional ao Cen·rio
 
             //tronco
             glColor3f(0.24,0.11,0.0);
@@ -488,7 +488,7 @@ void arvore(GLfloat x, GLfloat z){
 
 void mato(){
      corCorrente(0.0,0.3,0.0);
-	 
+
 	 //esquerda
      glBegin(GL_POLYGON);
         glVertex3f(300.0,0.0,-400.0);
@@ -496,16 +496,16 @@ void mato(){
         glVertex3f(-300,0.0,-200);
         glVertex3f(-300,0.0,-400);
      glEnd();
-	 
+
 	 //direita
-	 
+
 	 glBegin(GL_POLYGON);
         glVertex3f(-300.0,0.0,400.0);
         glVertex3f(-300,0.0,200);
         glVertex3f(300,0.0,200);
         glVertex3f(300,0.0,400);
      glEnd();
-	 
+
 }
 
 
@@ -520,17 +520,43 @@ void pista(){
 }
 
 void desenha_Cenario(){
-	int i, x, z;
+	int i, x1,x2, z;
 	glPushMatrix();
 		pista();
 		mato();
-		x = 0;
-		z = 0;
+		x1 = 300;
+		x2 = 277;
+		z = -380;// Mato Lado Esquerdo
 		for(i=0; i<quantidadeArvore; i++){
-			arvore(x,z);
+			x1 = x1-55;
+			x2 = x2-55;
+
+			arvore(x1,z);
+
+			arvore(x2,z+40);
+
+			arvore(x1,z+80);
+
+			arvore(x2,z+120);
 		//implementar aqui o incremento de x e z para desenhar as arvores dentro do mato
 		}
-		
+		x1 = 300;
+		x2 = 277;
+		z = 380; // Mato Lado Direito
+		for(i=0; i<quantidadeArvore; i++){
+			x1 = x1-55;
+			x2 = x2-55;
+
+			arvore(x1,z);
+
+			arvore(x2,z-40);
+
+			arvore(x1,z-80);
+
+			arvore(x2,z-120);
+		//implementar aqui o incremento de x e z para desenhar as arvores dentro do mato
+		}
+
 	glPopMatrix();
 	glutPostRedisplay();
 }
@@ -592,7 +618,7 @@ void SpecialKeyboard(int key, int x, int y){
 	case GLUT_KEY_F4:
 		tY_Cenario-=5;
 		break;
-		
+
 	case GLUT_KEY_F5:
 		tZ_Cenario+=5;
 		break;
@@ -649,9 +675,9 @@ void keyboard(unsigned char key, int x, int y){
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-	
+
 	glPushMatrix();
-	
+
 		glScalef(s,s,s);//zoom in out
 
 		glPushMatrix();
@@ -665,7 +691,7 @@ void display(){
 			desenha_Cenario();
 		glPopMatrix();
 
-		glPushMatrix();   
+		glPushMatrix();
 			glTranslatef(tX_Carro, 0.0, 0.0);
 			glTranslatef(0.0, tY_Carro, 0.0);
 			glTranslatef(0.0, 0.0, tZ_Carro);
@@ -675,7 +701,7 @@ void display(){
 			glRotatef(rZ_Carro, 0.0, 0.0, 1.0);
 			desenha_Carros();
 		glPopMatrix();
-	
+
 	glPopMatrix();
 
 	glutSwapBuffers();
