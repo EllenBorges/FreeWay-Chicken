@@ -1,6 +1,6 @@
 /*
-ComputaÃ§Ã£o GrÃ¡fica - Projeto Final - main
-Versao: 1.6
+Computacao Grafica - Projeto Final - main
+Versao: 1.7
 */
 
 #include <GL/glut.h>
@@ -18,8 +18,16 @@ float rX_Cenario, rY_Cenario, rZ_Cenario;
 
 float tX_Carro,tY_Carro, tZ_Carro;
 float tX_Cenario,tY_Cenario, tZ_Cenario;
-float time;
+float time, ComprimentoPista,LarguraPista,LarguraMato, PontoInicialX;
+
+//camera
+float PosicaoCameraX, PosicaoCameraY, PosicaoCameraZ, PRefX,PRefY, PRefZ, Vx, Vy, Vz; 
 GLfloat fAspect;
+int modoCamera;
+
+//jogabilidade
+
+int start;
 
 float quantidadeArvore = 15;
 
@@ -28,10 +36,25 @@ float quantidadeArvore = 15;
 void inicializar() {
   glClearColor(0.5f, 0.3f, 1.0f, 1.0f);
   time = 1.0;
+  LarguraPista = 200;
+  ComprimentoPista = 2000;
+  LarguraMato =2000;
+	
+  PontoInicialX = -ComprimentoPista+300;
+  PosicaoCameraX = -ComprimentoPista+300;
+  PosicaoCameraY = 700;
+  PosicaoCameraZ = 0;
+  PRefX = - ComprimentoPista+300;
+  PRefY = 0;
+  PRefZ = 0;
+  Vx = 1;
+  Vy = 0;
+  Vz = 0;
+	
   rX_Carro = 0.0;
   rY_Carro = 0.0;
   rZ_Carro = 0.0;
-  tX_Carro = 0.0;
+  tX_Carro = PontoInicialX;
   tY_Carro = 0.0;
   tZ_Carro = 0.0;
 
@@ -41,11 +64,14 @@ void inicializar() {
   tX_Cenario = 0.0;
   tY_Cenario = 0.0;
   tZ_Cenario = 0.0;
-
+ 
   s_Carro = 1.0;
   s_Cenario = 1.0;
   s = 1.0;
   angle = 45;
+	
+  start = 0;
+  modoCamera = 1; //default vista superior
   glMatrixMode(GL_PROJECTION);
  // glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
   glLoadIdentity();
@@ -53,7 +79,7 @@ void inicializar() {
   glEnable(GL_AUTO_NORMAL);
   glEnable(GL_NORMALIZE);
   glEnable(GL_MAP2_VERTEX_3);
-  quantidadeArvore = 10.0;
+  quantidadeArvore = 300;
 }
 
 /*-------------------------------------------Pontos de controle-----------------------------------------*/
@@ -158,7 +184,6 @@ void corCorrente(GLfloat r, GLfloat g, GLfloat b){
 	glColor3f(r, g, b);
 }
 
-/*-------------------------------------------Iluminacao-------------------------------------------------*/
 
 void SetupRC(void) {
     GLfloat luzAmbiente[4]={0.5, 0.5, 0.5, 1.0};
@@ -213,10 +238,16 @@ void SetupRC(void) {
 }
 
 /*-------------------------------------------Visualizacao-------------------------------------------------*/
-
+void Camera()
+{
+		//ponto inicial da camera
+	gluLookAt(PosicaoCameraX, PosicaoCameraY, PosicaoCameraZ, PRefX, PRefY, PRefZ, Vx, Vy, Vz);
+}
 
 /* Função usada para especificar o volume de visualização */
 void Viewing(void)	{
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	/* Especifica sistema de coordenadas de projeção */
 	glMatrixMode(GL_PROJECTION);
 	/* Inicializa sistema de coordenadas de projeção */
@@ -231,9 +262,11 @@ void Viewing(void)	{
 	glLoadIdentity();
 
 	/* Especifica posiÃ§Ã£o do observador e do alvo */
-	gluLookAt(-550, 400, 0, 0, 0, 0, 0, 1, 0);
-
+	
+    Camera();
+	
 }
+
 
 
 /*-------------------------------------------Redimensionamento--------------------------------------------*/
@@ -493,19 +526,19 @@ void mato(){
 
 	 //esquerda
      glBegin(GL_POLYGON);
-        glVertex3f(300.0,0.0,-400.0);
-        glVertex3f(300,0.0,-200);
-        glVertex3f(-300,0.0,-200);
-        glVertex3f(-300,0.0,-400);
+        glVertex3f(ComprimentoPista,0.0,-LarguraMato);
+        glVertex3f(ComprimentoPista,0.0,-LarguraPista);
+        glVertex3f(-ComprimentoPista,0.0,-LarguraPista);
+        glVertex3f(-ComprimentoPista,0.0,-LarguraMato);
      glEnd();
 
 	 //direita
 
 	 glBegin(GL_POLYGON);
-        glVertex3f(-300.0,0.0,400.0);
-        glVertex3f(-300,0.0,200);
-        glVertex3f(300,0.0,200);
-        glVertex3f(300,0.0,400);
+        glVertex3f(-ComprimentoPista,0.0,LarguraMato);
+        glVertex3f(-ComprimentoPista,0.0,LarguraPista);
+        glVertex3f(ComprimentoPista,0.0,LarguraPista);
+        glVertex3f(ComprimentoPista,0.0,LarguraMato);
      glEnd();
 
 }
@@ -514,10 +547,10 @@ void mato(){
 void pista(){
      corCorrente(0.3,0.3,0.3);
      glBegin(GL_POLYGON);
-        glVertex3f(300.0,0.0,-200.0);
-        glVertex3f(300,0.0,200);
-        glVertex3f(-300,0.0,200);
-        glVertex3f(-300,0.0,-200);
+        glVertex3f(ComprimentoPista,0.0,-LarguraPista);
+        glVertex3f(ComprimentoPista,0.0,LarguraPista);
+        glVertex3f(-ComprimentoPista,0.0,LarguraPista);
+        glVertex3f(-ComprimentoPista,0.0,-LarguraPista);
      glEnd();
 }
 
@@ -526,14 +559,12 @@ void desenha_Cenario(){
 	glPushMatrix();
 		pista();
 		mato();
-		x1 = 300;
-		x2 = 277;
+		x1 = 0;
+		x2 = 77;
 		z = -380;
-		// Mato Lado Esquerdo
+		// Floresta Lado Esquerdo
 		for(i=0; i<quantidadeArvore; i++){
-			x1 = x1-55;
-			x2 = x2-55;
-
+			
 			arvore(x1,z);
 
 			arvore(x2,z+40);
@@ -541,16 +572,17 @@ void desenha_Cenario(){
 			arvore(x1,z+80);
 
 			arvore(x2,z+120);
-		
-		}
-		x1 = 300;
-		x2 = 277;
-		z = 380; 
-		// Mato Lado Direito
-		for(i=0; i<quantidadeArvore; i++){
+			
 			x1 = x1-55;
 			x2 = x2-55;
 
+		}
+		x1 = 0;
+		x2 = 77;
+		z = 380; 
+		// Floresta Lado Direito
+		for(i=0; i<quantidadeArvore; i++){
+			
 			arvore(x1,z);
 
 			arvore(x2,z-40);
@@ -558,6 +590,9 @@ void desenha_Cenario(){
 			arvore(x1,z-80);
 
 			arvore(x2,z-120);
+			
+			x1 = x1-55;
+			x2 = x2-55;
 		
 		}
 
@@ -579,7 +614,16 @@ void desenha_Carros(){
 
 void animacao(){
 	//implementar aqui incrementos nas flags
-	glutPostRedisplay();
+	
+	if(start){
+
+			tX_Carro+=5;
+			PosicaoCameraX+=5;
+			PRefX+=5;
+			Viewing();
+			glutPostRedisplay();
+	
+	}
 }
 void timer(int i){
 	glutPostRedisplay();
@@ -593,19 +637,26 @@ void SpecialKeyboard(int key, int x, int y){
 
 	switch(key){
 	case GLUT_KEY_LEFT:
-	    if (tZ_Carro > -200) tZ_Carro-=5;
+	    if (tZ_Carro > -LarguraPista) tZ_Carro-=5;
 		break;
 
 	case GLUT_KEY_UP:
-	    if (tX_Carro < 300) tX_Carro+=5;
+	    if (tX_Carro < ComprimentoPista) 
+		{
+			start = 1;
+			tX_Carro+=5;
+		}
 		break;
 
 	case GLUT_KEY_RIGHT:
-	    if (tZ_Carro < 200) tZ_Carro+=5;
+	    if (tZ_Carro < LarguraPista) tZ_Carro+=5;
 		break;
 
 	case GLUT_KEY_DOWN:
-	    if (tX_Carro > -300) tX_Carro-=5;
+	    if (tX_Carro > -ComprimentoPista) 
+		{
+			tX_Carro-=5;
+		}
 		break;
 
 	case GLUT_KEY_F1:
@@ -635,6 +686,7 @@ void SpecialKeyboard(int key, int x, int y){
 		break;
 
 	}
+	
 
 }
 void keyboard(unsigned char key, int x, int y){
@@ -666,6 +718,38 @@ void keyboard(unsigned char key, int x, int y){
 			if(s>0.5)
 				s -= 0.5;
 			break;
+		case 'c': //vista cima
+		case 'C':
+			modoCamera = 1;
+			PosicaoCameraY = 700;
+			PosicaoCameraZ = 0;
+			Vx = 1;
+			Vy = 0;
+			Vz = 0;
+			Viewing();
+			glutPostRedisplay();
+			break;
+		case 't': //tras
+		case 'T':
+				//IMPLEMENTAR vista de tras da camera
+			modoCamera = 2;
+			break;
+		case 'f'://vista frontal
+		case 'F':
+                  //IMPLEMENTAR vista frontal da camera
+			modoCamera = 3;
+			break;
+		case 'l': //vista lateral
+		case 'L': 
+			modoCamera = 4;
+			PosicaoCameraY = 20;
+			PosicaoCameraZ = -250;
+		    Vx = 0;
+		    Vy = 0;
+		    Vz = 1;
+			Viewing();
+			glutPostRedisplay();
+			break;
 		case 27:
 			exit(0);
 			break;
@@ -679,7 +763,7 @@ void keyboard(unsigned char key, int x, int y){
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-
+ 
 	glPushMatrix();
 
 		glScalef(s,s,s);//zoom in out
@@ -722,8 +806,8 @@ int main(int argc, char* argv[]){
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(SpecialKeyboard);
 	glutDisplayFunc(display);
-	//glutIdleFunc(animacao);
-	//glutTimerFunc(time, timer, 1);
+	glutIdleFunc(animacao);
+	glutTimerFunc(time, timer, 1);
 	glutReshapeFunc(ChangeSize);
 	SetupRC();
 	glutMainLoop();
