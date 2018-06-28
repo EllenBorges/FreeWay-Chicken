@@ -1,24 +1,25 @@
 /*
 Computacao Grafica - Projeto Final - main
-Versao: 1.7
+Ellen Priscila Borges Oliveira
+Versao: 1.8
 */
 
 #include <GL/glut.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define DEFAULT_WINDOW_SIZE_W 800.0
-#define DEFAULT_WINDOW_SIZE_H 800.0
+#define DEFAULT_WINDOW_SIZE_W 1500.0
+#define DEFAULT_WINDOW_SIZE_H 1000.0
 
 GLfloat angle;
 int width, heigth;
 float s,s_Carro,s_Cenario;
 
-float rX_Carro, rY_Carro, rZ_Carro;
+float rX_Carro, rY_Carro, rZ_Carro, rZ_rodas;
 float rX_Cenario, rY_Cenario, rZ_Cenario;
 
 float tX_Carro,tY_Carro, tZ_Carro;
 float tX_Cenario,tY_Cenario, tZ_Cenario;
-float time, ComprimentoPista,LarguraPista,LarguraMato, PontoInicialX;
+float time, ComprimentoPista,LarguraPista,LarguraMato, PontoInicialX, InicioArvore;
 
 //camera
 float PosicaoCameraX, PosicaoCameraY, PosicaoCameraZ, PRefX,PRefY, PRefZ, Vx, Vy, Vz; 
@@ -28,28 +29,37 @@ int modoCamera;
 //jogabilidade
 
 int start;
+int pause;
+float quantidadeArvore;
 
-float quantidadeArvore = 15;
-
+//textura
+typedef struct BMPImagem
+{
+    int   width;
+    int   height;
+    char *data;
+}BMPImage;
+GLuint texture_id[1];
 /*-------------------------------------------Variaveis de Inicializacao---------------------------------*/
 
 void inicializar() {
-  glClearColor(0.5f, 0.3f, 1.0f, 1.0f);
+
+  glClearColor(0.3f, 0.8f, 1.0f, 1.0f);
   time = 1.0;
-  LarguraPista = 200;
-  ComprimentoPista = 2000;
-  LarguraMato =2000;
-	
-  PontoInicialX = -ComprimentoPista+300;
-  PosicaoCameraX = -ComprimentoPista+300;
-  PosicaoCameraY = 700;
+  LarguraPista = 1;
+  ComprimentoPista = 1000;
+  LarguraMato = 400;
+  InicioArvore = 1.9;
+  PontoInicialX = 10-ComprimentoPista;
+  PosicaoCameraX = 11-ComprimentoPista;
+  PosicaoCameraY = 5;
   PosicaoCameraZ = 0;
-  PRefX = - ComprimentoPista+300;
+  PRefX = 11 - ComprimentoPista;
   PRefY = 0;
   PRefZ = 0;
   Vx = 1;
   Vy = 0;
-  Vz = 0;
+  Vz = 0;	
 	
   rX_Carro = 0.0;
   rY_Carro = 0.0;
@@ -71,15 +81,16 @@ void inicializar() {
   angle = 45;
 	
   start = 0;
+  pause  = 0;
   modoCamera = 1; //default vista superior
   glMatrixMode(GL_PROJECTION);
- // glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+  glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
   glLoadIdentity();
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_AUTO_NORMAL);
   glEnable(GL_NORMALIZE);
   glEnable(GL_MAP2_VERTEX_3);
-  quantidadeArvore = 300;
+  quantidadeArvore = 200;
 }
 
 /*-------------------------------------------Pontos de controle-----------------------------------------*/
@@ -200,9 +211,7 @@ void SetupRC(void) {
     GLint especMaterial = 20;
 
 /* Especifica que a cor de fundo da janela serÃ¡ azul clara */
-     glClearColor(0.3f, 0.8f, 1.0f, 1.0f);
-
-
+	glClearColor(0.3f, 0.8f, 1.0f, 1.0f);
 /* Ativa o uso da luz ambiente */
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente);
 
@@ -294,7 +303,81 @@ void ChangeSize(GLsizei w, GLsizei h){
 
 	Viewing();
 }
+/*-------------------------------------------Funçoes de Textura--------------------------------------------*/
 
+void getBitmapImageData( char *pFileName, BMPImage *pImage )
+{
+    FILE *pFile = NULL;
+    unsigned short nNumPlanes;
+    unsigned short nNumBPP;
+	int i;
+
+    if( (pFile = fopen(pFileName, "rb") ) == NULL )
+		printf("ERROR: getBitmapImageData - %s not found.\n", pFileName);
+
+    // Seek forward to width and height info
+    fseek( pFile, 18, SEEK_CUR );
+
+    if( (i = fread(&pImage->width, 4, 1, pFile) ) != 1 )
+		printf("ERROR: getBitmapImageData - Couldn't read width from %s.\n ", pFileName);
+
+    if( (i = fread(&pImage->height, 4, 1, pFile) ) != 1 )
+		printf("ERROR: getBitmapImageData - Couldn't read height from %s.\n ", pFileName);
+
+    if( (fread(&nNumPlanes, 2, 1, pFile) ) != 1 )
+		printf("ERROR: getBitmapImageData - Couldn't read plane count from %s.\n", pFileName);
+
+    if( nNumPlanes != 1 )
+		printf("ERROR: getBitmapImageData - Plane count from %s.\n ", pFileName);
+
+    if( (i = fread(&nNumBPP, 2, 1, pFile)) != 1 )
+		printf( "ERROR: getBitmapImageData - Couldn't read BPP from %s.\n ", pFileName);
+
+    if( nNumBPP != 24 )
+		printf("ERROR: getBitmapImageData - BPP from %s.\n ", pFileName);
+
+    // Seek forward to image data
+    fseek( pFile, 24, SEEK_CUR );
+
+	// Calculate the image's total size in bytes. Note how we multiply the
+	// result of (width * height) by 3. This is becuase a 24 bit color BMP
+	// file will give you 3 bytes per pixel.
+    int nTotalImagesize = (pImage->width * pImage->height) * 3;
+
+    pImage->data = (char*) malloc( nTotalImagesize );
+
+    if( (i = fread(pImage->data, nTotalImagesize, 1, pFile) ) != 1 )
+		printf("ERROR: getBitmapImageData - Couldn't read image data from %s.\n ", pFileName);
+
+    //
+	// Finally, rearrange BGR to RGB
+	//
+
+	char charTemp;
+    for( i = 0; i < nTotalImagesize; i += 3 )
+	{
+		charTemp = pImage->data[i];
+		pImage->data[i] = pImage->data[i+2];
+		pImage->data[i+2] = charTemp;
+    }
+}
+
+void Texture1(){
+	/* textura */
+	BMPImage imagemTextura,imagemTexturaPista ;
+    getBitmapImageData("asfalto2.bmp", &imagemTextura);
+    glEnable(GL_TEXTURE_2D);
+    glGenTextures(1, &texture_id[0]);
+    glBindTexture(GL_TEXTURE_2D, texture_id[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, imagemTextura.width,imagemTextura.height, 0, GL_RGB, GL_UNSIGNED_BYTE,imagemTextura.data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//ampliacao de acordo com a media dos pontos
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); //reducao de acordo com a media dos pontos
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //repeticao na horizontal
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); //repeticao na vertical
+    glEnable(GL_TEXTURE_GEN_S);
+    glEnable(GL_TEXTURE_GEN_T);
+
+}
 /*-------------------------------------------Funçoes de Desenho--------------------------------------------*/
 
 
@@ -304,9 +387,11 @@ void carro(GLfloat r, GLfloat g, GLfloat b){
 		glTranslatef(0.0,5.0,0.0);
 		//rodas
 		glPushMatrix();
+			
 			glPushMatrix();
 				glColor4f(0.0, 0.0, 0,0.5);
 				glTranslatef(12.0,0.0,12.0);
+				glRotatef(rZ_rodas,0,0,1);
 				glutSolidTorus(2.0,3.5,50.0,50.0);
 				corCorrente(0.5, 0.5, 0.5);
 				glutSolidSphere(2.0, 100.0, 20.0);
@@ -315,28 +400,31 @@ void carro(GLfloat r, GLfloat g, GLfloat b){
 			glPushMatrix();
 				glColor4f(0.0, 0.0, 0.0,0.5);
 				glTranslatef(-12.0,0.0,12.0);
+				glRotatef(rZ_rodas,0,0,1);
 				glutSolidTorus(2.0,3.5,50.0,50.0);
 				corCorrente(0.5, 0.5, 0.5);
 				glutSolidSphere(2.0, 100.0, 20);
 			 glPopMatrix();
-
+			
 			glPushMatrix();
 				glColor4f(0.0, 0.0, 0,0.5);
 				glTranslatef(-12.0,0.0,-12.0);
+				glRotatef(rZ_rodas,0,0,1);
 				glutSolidTorus(2.0,3.5,50.0,50.0);
 				corCorrente(0.5, 0.5, 0.5);
 				glutSolidSphere(2.0, 100.0, 20);
+				
 			 glPopMatrix();
 
 			glPushMatrix();
 				glColor4f(0.0, 0.0, 0,0.5);
 				glTranslatef(12.0,0.0,-12.0);
+				glRotatef(rZ_rodas,0,0,1);
 				glutSolidTorus(2.0,3.5,50.0,50.0);
 				corCorrente(0.5, 0.5, 0.5);
 				glutSolidSphere(2.0, 100.0, 20);
 			 glPopMatrix();
 		glPopMatrix();
-
 
 		glPushMatrix();
 		glRotatef(90,1,0,0);
@@ -488,17 +576,16 @@ void carro(GLfloat r, GLfloat g, GLfloat b){
 	glPopMatrix();
 
 }
+
 void arvore(GLfloat x, GLfloat z){
     GLfloat arvoreX = x;
     GLfloat arvoreZ = z;
     //arvore
         glPushMatrix();
-             glTranslatef(arvoreX,15,arvoreZ);//Deixar com a base mais rente ao plano do jogo, portanto subir 15 unidades em Y
-             glScaled(5,5,5);//Deixar mais proporcional ao Cenário
-
-            //tronco
-            glColor3f(0.24,0.11,0.0);
-            glColor3f(0.117,0.0549,0.0235);
+             glTranslatef(arvoreX,0,arvoreZ);//Deixar com a base mais rente ao plano do jogo, portanto subir 15 unidades em Y
+             glScaled(0.05,0.05,0.05);//Deixar mais proporcional ao Cenário
+            //tronco       
+            corCorrente(0.117,0.0549,0.0235);
             glPushMatrix();
                  glTranslatef(0,2,0);
                  glRotatef(90,0.5,0,0);
@@ -506,8 +593,8 @@ void arvore(GLfloat x, GLfloat z){
                    gluQuadricNormals(qobj, GLU_SMOOTH);
                  gluCylinder(qobj,0.5, 1.5, 5,50, 10);
             glPopMatrix();
-            //folhas
-            glColor3f(0.0,0.086,0.058);
+            //folhas   
+			corCorrente(0.0,0.3,0.0);
             glPushMatrix();
                 glTranslatef(0,2,0);
                 glRotatef(-90,1,0,0);
@@ -522,113 +609,101 @@ void arvore(GLfloat x, GLfloat z){
 }
 
 void mato(){
-     corCorrente(0.0,0.3,0.0);
+	 corCorrente(0.0,0.1,0.0);
+	glPushMatrix();
+		 //esquerda
+		 glBegin(GL_POLYGON);
+			glVertex3f(ComprimentoPista,0.0,-LarguraMato);
+			glVertex3f(ComprimentoPista,0.0,-LarguraPista);
+			glVertex3f(-ComprimentoPista,0.0,-LarguraPista);
+			glVertex3f(-ComprimentoPista,0.0,-LarguraMato);
+		 glEnd();
 
-	 //esquerda
-     glBegin(GL_POLYGON);
-        glVertex3f(ComprimentoPista,0.0,-LarguraMato);
-        glVertex3f(ComprimentoPista,0.0,-LarguraPista);
-        glVertex3f(-ComprimentoPista,0.0,-LarguraPista);
-        glVertex3f(-ComprimentoPista,0.0,-LarguraMato);
-     glEnd();
-
-	 //direita
-
-	 glBegin(GL_POLYGON);
-        glVertex3f(-ComprimentoPista,0.0,LarguraMato);
-        glVertex3f(-ComprimentoPista,0.0,LarguraPista);
-        glVertex3f(ComprimentoPista,0.0,LarguraPista);
-        glVertex3f(ComprimentoPista,0.0,LarguraMato);
-     glEnd();
+		 //direita
+		 glBegin(GL_POLYGON);
+			glVertex3f(-ComprimentoPista,0.0,LarguraMato);
+			glVertex3f(-ComprimentoPista,0.0,LarguraPista);
+			glVertex3f(ComprimentoPista,0.0,LarguraPista);
+			glVertex3f(ComprimentoPista,0.0,LarguraMato);
+		 glEnd();
+	glPopMatrix();
 
 }
 
 
 void pista(){
-     corCorrente(0.3,0.3,0.3);
+	
+     corCorrente(1.0,1.0,1.0);
+	 glEnable(GL_TEXTURE_2D);
      glBegin(GL_POLYGON);
         glVertex3f(ComprimentoPista,0.0,-LarguraPista);
         glVertex3f(ComprimentoPista,0.0,LarguraPista);
         glVertex3f(-ComprimentoPista,0.0,LarguraPista);
         glVertex3f(-ComprimentoPista,0.0,-LarguraPista);
      glEnd();
+	 glDisable(GL_TEXTURE_2D); 
+	
+}
+void desenha_Carros(){
+
+	glPushMatrix();	  
+	   glScaled(0.01,0.01,0.01);
+		carro(0.7,0.0,0.0);//vermelho
+	
+		//implementar aqui a chamada para desenho dos carros concorrentes
+	
+	glPopMatrix();
+	glutPostRedisplay();
 }
 
 void desenha_Cenario(){
-	int i, x1,x2, z,z2,z3,z4;
+	int i, x1,x2, x3, z;
+	mato();
+	pista();
 	glPushMatrix();
-		pista();
-		mato();
 		x1 = 0;
-		x2 = 77;
-		z = -380;
+		x2 = 2;
+		x3 = 3;
+		z = -InicioArvore;
 		// Floresta Lado Esquerdo
-		for(i=0; i<quantidadeArvore; i++){
-			
+		for(i=0; i<quantidadeArvore; i++){		
 			arvore(x1,z);
-
-			arvore(x2,z+40);
-
-			arvore(x1,z+80);
-
-			arvore(x2,z+120);
-			
-			x1 = x1-55;
-			x2 = x2-55;
-
+			arvore(x2,z+2);
+			arvore(x3,z+3);
+			arvore(x2,z+4);
+			arvore(x1,z+6);	
+			arvore(x3,z+8);
+			arvore(x1,z+10);
+			arvore(x2,z+12);		
+			x1 = x1-5;
+			x2 = x2-5;
+			x3 = x3-5;
 		}
 		x1 = 0;
-		x2 = 77;
-		z = 380; 
+		x2 = 2;
+	    x3 = 3;
+		z = InicioArvore; 
 		// Floresta Lado Direito
-		for(i=0; i<quantidadeArvore; i++){
-			
+		for(i=0; i<quantidadeArvore; i++){	
 			arvore(x1,z);
-
-			arvore(x2,z-40);
-
-			arvore(x1,z-80);
-
-			arvore(x2,z-120);
-			
-			x1 = x1-55;
-			x2 = x2-55;
-		
+			arvore(x2,z-2);
+			arvore(x3,z-3);
+			arvore(x2,z-4);
+			arvore(x1,z-6);		
+			arvore(x3,z-8);
+			arvore(x1,z-10);
+			arvore(x2,z-12);		
+			x1 = x1-5;
+			x2 = x2-5;
+			x3 = x3-5;		
 		}
 
 	glPopMatrix();
 	glutPostRedisplay();
 }
 
-void desenha_Carros(){
 
-	glPushMatrix();
-		corCorrente(1.0,0.0,0.0);
-		carro(0.7,0.0,0.0);//vermelho
-		//carro(0.0,0.7,0.0);//verde
-		//carro(0.0,0.0,0.7);//azul
-	glPopMatrix();
-	glutPostRedisplay();
-}
-/*-------------------------------------------Animacao----------------------------------------------------*/
 
-void animacao(){
-	//implementar aqui incrementos nas flags
-	
-	if(start){
-
-			tX_Carro+=5;
-			PosicaoCameraX+=5;
-			PRefX+=5;
-			Viewing();
-			glutPostRedisplay();
-	
-	}
-}
-void timer(int i){
-	glutPostRedisplay();
-	glutTimerFunc(time, timer, 1);
-}
 
 /*---------------------------------------Funcoes de Interacao--------------------------------------------*/
 
@@ -637,49 +712,52 @@ void SpecialKeyboard(int key, int x, int y){
 
 	switch(key){
 	case GLUT_KEY_LEFT:
-	    if (tZ_Carro > -LarguraPista) tZ_Carro-=5;
+	    if (tZ_Carro > -LarguraPista+0.4) tZ_Carro-=0.1;
 		break;
 
 	case GLUT_KEY_UP:
 	    if (tX_Carro < ComprimentoPista) 
 		{
 			start = 1;
-			tX_Carro+=5;
+			pause = 0;
+			tX_Carro+=0.2;
+			
 		}
 		break;
 
 	case GLUT_KEY_RIGHT:
-	    if (tZ_Carro < LarguraPista) tZ_Carro+=5;
+	    if (tZ_Carro < LarguraPista-0.4) tZ_Carro+=0.1;
 		break;
 
 	case GLUT_KEY_DOWN:
 	    if (tX_Carro > -ComprimentoPista) 
 		{
-			tX_Carro-=5;
+			tX_Carro-=0.2;
+			
 		}
 		break;
 
 	case GLUT_KEY_F1:
-		tX_Cenario+=5;
+		tX_Cenario+=0.5;
 		break;
 
 	case GLUT_KEY_F2:
-		tX_Cenario-=5;
+		tX_Cenario-=0.5;
 		break;
 	case GLUT_KEY_F3:
-		tY_Cenario+=5;
+		tY_Cenario+=0.5;
 		break;
 
 	case GLUT_KEY_F4:
-		tY_Cenario-=5;
+		tY_Cenario-=0.5;
 		break;
 
 	case GLUT_KEY_F5:
-		tZ_Cenario+=5;
+		tZ_Cenario+=0.5;
 		break;
 
 	case GLUT_KEY_F6:
-		tZ_Cenario-=5;
+		tZ_Cenario-=0.5;
 		break;
 
 	default:
@@ -692,63 +770,123 @@ void SpecialKeyboard(int key, int x, int y){
 void keyboard(unsigned char key, int x, int y){
 	switch(key){
 		case 'x':
-			rX_Carro += 5;
+			rX_Carro += 0.5;
 			break;
 
 		case 'X':
-			rX_Carro -= 5;
+			rX_Carro -= 0.5;
 			break;
 		case 'y':
-			rY_Carro += 5;
+			rY_Carro += 0.5;
 			break;
 		case 'Y':
-			rY_Carro -= 5;
+			rY_Carro -= 0.5;
 			break;
 		case 'z':
-			rZ_Carro += 5;
+			rZ_Carro += 0.5;
 			break;
 		case 'Z':
-			rZ_Carro -= 5;
+			rZ_Carro -= 0.5;
 			break;
 		case '+':
-			if(s<4.0)
-				s += 0.5;
+			//implementar aqui zoomin para as quatro perspectivas
 			break;
 		case '-':
-			if(s>0.5)
-				s -= 0.5;
+			
+				if(modoCamera==1){
+					if(PosicaoCameraY<10){
+						PosicaoCameraY += 1;
+						Viewing();
+			        	glutPostRedisplay();
+					}
+				}else if(modoCamera==2){
+						if(PosicaoCameraY<10 && PosicaoCameraX> (tX_Carro-12)){
+							  PosicaoCameraY -= 1;
+							  PosicaoCameraX -= 1;
+							  Viewing();
+							  glutPostRedisplay();
+							}
+					  }else if(modoCamera==3){
+							  //implementar aqui zoom out para quando a camera estiver na vista frontal
+								  
+					  		}else if(modoCamera==4){
+								  
+								 //implementar aqui zoom out para quando a camera estiver na vista lateral
+									
+					  		}		
+					
 			break;
 		case 'c': //vista cima
 		case 'C':
-			modoCamera = 1;
-			PosicaoCameraY = 700;
-			PosicaoCameraZ = 0;
-			Vx = 1;
-			Vy = 0;
-			Vz = 0;
-			Viewing();
-			glutPostRedisplay();
+			if(modoCamera!=1){
+				modoCamera = 1;
+				PosicaoCameraX = tX_Carro+1;
+				PRefX = tX_Carro +1;
+				PosicaoCameraY = 5;
+				PRefY = 0;
+				PosicaoCameraZ = 0;
+				PRefZ = 0;
+				Vx = 1;
+				Vy = 0;
+				Vz = 0;		
+				Viewing();
+				glutPostRedisplay();
+			}
 			break;
 		case 't': //tras
 		case 'T':
-				//IMPLEMENTAR vista de tras da camera
-			modoCamera = 2;
+			if(modoCamera!=2){
+				modoCamera = 2;
+				PosicaoCameraX = tX_Carro-10;
+				PRefX=tX_Carro;
+				PosicaoCameraY = 5;
+				PRefY = 0;
+				PosicaoCameraZ = 0;
+				PRefZ = 0;
+				Vx = 1;
+				Vy = 0;
+				Vz = 0;		
+				Viewing();
+				glutPostRedisplay();
+			}
 			break;
 		case 'f'://vista frontal
 		case 'F':
-                  //IMPLEMENTAR vista frontal da camera
-			modoCamera = 3;
+			if(modoCamera!=3){
+				modoCamera = 3;
+				PosicaoCameraX = tX_Carro+10;
+				PRefX=tX_Carro;
+				PosicaoCameraY = 5;
+				PRefY = 0;
+				PosicaoCameraZ = 0;
+				PRefZ = 0;
+				Vx = -1;
+				Vy = 0;
+				Vz = 0;		
+				Viewing();
+				glutPostRedisplay();
+			}
 			break;
 		case 'l': //vista lateral
 		case 'L': 
-			modoCamera = 4;
-			PosicaoCameraY = 20;
-			PosicaoCameraZ = -250;
-		    Vx = 0;
-		    Vy = 0;
-		    Vz = 1;
-			Viewing();
-			glutPostRedisplay();
+			if(modoCamera!=4){
+				modoCamera = 4;
+				PosicaoCameraX = tX_Carro;
+				PRefX = tX_Carro;
+				PosicaoCameraY = 0.009;
+				PRefY = 0.4;
+				PosicaoCameraZ = -1;
+				PRefZ = 0;
+				Vx = 0;
+				Vy = 0;
+				Vz = -1;
+				Viewing();
+				glutPostRedisplay();
+			}
+			break;
+		case 'p': //vista lateral
+		case 'P':
+			pause = 1;
 			break;
 		case 27:
 			exit(0);
@@ -758,6 +896,34 @@ void keyboard(unsigned char key, int x, int y){
 	}
 }
 
+void  menu(){
+	
+	//Implementar aqui funcao para disponibilizar menu
+}
+/*-------------------------------------------Animacao----------------------------------------------------*/
+void colisa(){
+		//Implementar aqui as animacoes de colisao
+}
+
+void animacao(){
+	//implementar aqui velocidade gradativa
+	
+	if(start==1 && pause==0){
+			//velocidade constante
+			tX_Carro+=0.5;
+			PosicaoCameraX+=0.5;
+			PRefX+=0.5;
+			rZ_rodas+=0.7;
+			Viewing();
+			glutPostRedisplay();
+	
+	}
+	//implementar aqui chamada de colisao caso precise
+}
+void timer(int i){
+	glutPostRedisplay();
+	glutTimerFunc(time, timer, 1);
+}
 /*-------------------------------------------Display----------------------------------------------------*/
 
 void display(){
@@ -765,9 +931,6 @@ void display(){
 	glEnable(GL_DEPTH_TEST);
  
 	glPushMatrix();
-
-		glScalef(s,s,s);//zoom in out
-
 		glPushMatrix();
 			glTranslatef(tX_Cenario, 0.0, 0.0);
 			glTranslatef(0.0, tY_Cenario, 0.0);
@@ -794,17 +957,30 @@ void display(){
 
 	glutSwapBuffers();
 }
+
+void capa(){
+	//implementar aqui viewport inicial que disponibiliza a capa como textura na janela de recorte e apos pressionar enter chame a viewport1	
+}
+/*-----------------------------------------------Pontuacao do jogo-------------------------------------------------*/
+
+void disponibilizaPontuacao(){
+	//Implementar aqui viewport para visualizacao da pontuacao e do clock	
+}
+void pontuacao(){
+	//Implementar aqui logica da pontuacao do jogo	
+}
 /*-----------------------------------------------Main-------------------------------------------------*/
 
 int main(int argc, char* argv[]){
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(DEFAULT_WINDOW_SIZE_W, DEFAULT_WINDOW_SIZE_H);
-	glutCreateWindow("SpeedWay 3D");
+	glutCreateWindow("SpeedWay 3D");	
 	inicializar();
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(SpecialKeyboard);
+	Texture1();
 	glutDisplayFunc(display);
 	glutIdleFunc(animacao);
 	glutTimerFunc(time, timer, 1);
