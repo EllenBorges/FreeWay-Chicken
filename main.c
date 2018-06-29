@@ -91,7 +91,10 @@ void inicializar() {
   glEnable(GL_NORMALIZE);
   glEnable(GL_MAP2_VERTEX_3);
   quantidadeArvore = 200;
+
+
 }
+
 
 /*-------------------------------------------Pontos de controle-----------------------------------------*/
 
@@ -791,8 +794,7 @@ void keyboard(unsigned char key, int x, int y){
 		case '+':
 			//implementar aqui zoomin para as quatro perspectivas
 			break;
-		case '-':
-			
+		case '-':		
 				if(modoCamera==1){
 					if(PosicaoCameraY<10){
 						PosicaoCameraY += 1;
@@ -816,59 +818,25 @@ void keyboard(unsigned char key, int x, int y){
 					  		}		
 					
 			break;
-		case 'c': //vista cima
-		case 'C':
-			if(modoCamera!=1){
-				modoCamera = 1;
-				PosicaoCameraX = tX_Carro+1;
-				PRefX = tX_Carro +1;
-				PosicaoCameraY = 5;
-				PRefY = 0;
-				PosicaoCameraZ = 0;
-				PRefZ = 0;
-				Vx = 1;
-				Vy = 0;
-				Vz = 0;		
-				Viewing();
-				glutPostRedisplay();
-			}
+	}
+}
+
+/**MENU**/
+void ProcessMenu(int value)
+{ 
+    switch(value)
+        {
+        case 1:
+            exit(0);
+            break;
+		case 2:
+			pause = 1;
 			break;
-		case 't': //tras
-		case 'T':
-			if(modoCamera!=2){
-				modoCamera = 2;
-				PosicaoCameraX = tX_Carro-10;
-				PRefX=tX_Carro;
-				PosicaoCameraY = 5;
-				PRefY = 0;
-				PosicaoCameraZ = 0;
-				PRefZ = 0;
-				Vx = 1;
-				Vy = 0;
-				Vz = 0;		
-				Viewing();
-				glutPostRedisplay();
-			}
-			break;
-		case 'f'://vista frontal
-		case 'F':
-			if(modoCamera!=3){
-				modoCamera = 3;
-				PosicaoCameraX = tX_Carro+10;
-				PRefX=tX_Carro;
-				PosicaoCameraY = 5;
-				PRefY = 0;
-				PosicaoCameraZ = 0;
-				PRefZ = 0;
-				Vx = -1;
-				Vy = 0;
-				Vz = 0;		
-				Viewing();
-				glutPostRedisplay();
-			}
-			break;
-		case 'l': //vista lateral
-		case 'L': 
+		case 3:
+			pause = 0;
+			start = 1;
+			break;	
+		case 4:
 			if(modoCamera!=4){
 				modoCamera = 4;
 				PosicaoCameraX = tX_Carro;
@@ -884,20 +852,70 @@ void keyboard(unsigned char key, int x, int y){
 				glutPostRedisplay();
 			}
 			break;
-		case 'p': //vista lateral
-		case 'P':
-			pause = 1;
+		case 5:
+			if(modoCamera!=3){
+				modoCamera = 3;
+				PosicaoCameraX = tX_Carro+10;
+				PRefX=tX_Carro;
+				PosicaoCameraY = 5;
+				PRefY = 0;
+				PosicaoCameraZ = 0;
+				PRefZ = 0;
+				Vx = -1;
+				Vy = 0;
+				Vz = 0;		
+				Viewing();
+				glutPostRedisplay();
+			}
 			break;
-		case 27:
-			exit(0);
+		case 6:
+			if(modoCamera!=2){
+				modoCamera = 2;
+				PosicaoCameraX = tX_Carro-10;
+				PRefX=tX_Carro;
+				PosicaoCameraY = 5;
+				PRefY = 0;
+				PosicaoCameraZ = 0;
+				PRefZ = 0;
+				Vx = 1;
+				Vy = 0;
+				Vz = 0;		
+				Viewing();
+				glutPostRedisplay();
+			}
 			break;
-    	default:
+		case 7:
+			if(modoCamera!=1){
+				modoCamera = 1;
+				PosicaoCameraX = tX_Carro+1;
+				PRefX = tX_Carro +1;
+				PosicaoCameraY = 5;
+				PRefY = 0;
+				PosicaoCameraZ = 0;
+				PRefZ = 0;
+				Vx = 1;
+				Vy = 0;
+				Vz = 0;		
+				Viewing();
+				glutPostRedisplay();
+			}
 			break;
-	}
-}
+        }
 
+    glutPostRedisplay();    // Redisplay
+
+}
 void  menu(){
-	
+		
+	glutCreateMenu(ProcessMenu);
+    glutAddMenuEntry("Finalizar",1);
+	glutAddMenuEntry("Pausar",2);
+	glutAddMenuEntry("Iniciar",3);
+	glutAddMenuEntry("Camera Lateral",4);
+	glutAddMenuEntry("Camera Frontal",5);
+	glutAddMenuEntry("Camera Traseira",6);
+	glutAddMenuEntry("Camera Superior",7);
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
 	//Implementar aqui funcao para disponibilizar menu
 }
 /*-------------------------------------------Animacao----------------------------------------------------*/
@@ -978,6 +996,7 @@ int main(int argc, char* argv[]){
 	glutInitWindowSize(DEFAULT_WINDOW_SIZE_W, DEFAULT_WINDOW_SIZE_H);
 	glutCreateWindow("SpeedWay 3D");	
 	inicializar();
+	menu();
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(SpecialKeyboard);
 	Texture1();
