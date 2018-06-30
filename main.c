@@ -7,18 +7,19 @@ Versao: 1.8
 #include <GL/glut.h>
 #include <stdio.h>
 #include <stdlib.h>
+//#include "loadTexture.h"
 #define DEFAULT_WINDOW_SIZE_W 1500.0
 #define DEFAULT_WINDOW_SIZE_H 1000.0
+#define MADEIRA 3
+#define MATO 2
+#define PISTA 1
 
 GLfloat angle;
 int width, heigth;
-float s,s_Carro,s_Cenario;
-
+float s, s_Carro,xView,yView;
 float rX_Carro, rY_Carro, rZ_Carro, rZ_rodas;
-float rX_Cenario, rY_Cenario, rZ_Cenario;
-
 float tX_Carro,tY_Carro, tZ_Carro;
-float tX_Cenario,tY_Cenario, tZ_Cenario;
+float tX_CarroVerde, tZ_CarroVerde,tX_CarroAzul,tZ_CarroAzul,tX_CarroCinza,tZ_CarroCinza;
 float time, ComprimentoPista,LarguraPista,LarguraMato, PontoInicialX, InicioArvore;
 
 //camera
@@ -31,15 +32,17 @@ int modoCamera;
 int start;
 int pause;
 float quantidadeArvore;
+float quantidadeCarros;
 
 //textura
+
 typedef struct BMPImagem
-{
-    int   width;
+{   
+	int   width;
     int   height;
     char *data;
 }BMPImage;
-GLuint texture_id[1];
+GLuint texture_id[30];
 /*-------------------------------------------Variaveis de Inicializacao---------------------------------*/
 
 void inicializar() {
@@ -60,7 +63,8 @@ void inicializar() {
   Vx = 1;
   Vy = 0;
   Vz = 0;	
-	
+  xView = 0;
+  yView = 0;
   rX_Carro = 0.0;
   rY_Carro = 0.0;
   rZ_Carro = 0.0;
@@ -68,18 +72,15 @@ void inicializar() {
   tY_Carro = 0.0;
   tZ_Carro = 0.0;
 
-  rX_Cenario = 0.0;
-  rY_Cenario = 0.0;
-  rZ_Cenario = 0.0;
-  tX_Cenario = 0.0;
-  tY_Cenario = 0.0;
-  tZ_Cenario = 0.0;
- 
+  tX_CarroVerde = PontoInicialX;
+  tZ_CarroVerde = 0;
+  tX_CarroAzul = PontoInicialX-15;
+  tZ_CarroAzul =  0.8;
+  tX_CarroCinza = PontoInicialX;
+  tZ_CarroCinza = -0.8; 
   s_Carro = 1.0;
-  s_Cenario = 1.0;
   s = 1.0;
   angle = 45;
-	
   start = 0;
   pause  = 0;
   modoCamera = 1; //default vista superior
@@ -91,7 +92,7 @@ void inicializar() {
   glEnable(GL_NORMALIZE);
   glEnable(GL_MAP2_VERTEX_3);
   quantidadeArvore = 200;
-
+  quantidadeCarros = 15;
 
 }
 
@@ -224,11 +225,6 @@ void SetupRC(void) {
     glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular);
     glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz);
 
-/*glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, light1_Direcao);
-    glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 25.0);
-    glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 8.0);*/
-
-
 /* define as propriedades do material */
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, objeto_ambiente);
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, objeto_difusa);
@@ -280,7 +276,6 @@ void Viewing(void)	{
 }
 
 
-
 /*-------------------------------------------Redimensionamento--------------------------------------------*/
 
 
@@ -299,12 +294,12 @@ void ChangeSize(GLsizei w, GLsizei h){
 	}
 
 	/* Especifica o tamanho da viewport */
-	glViewport(0, 0, w, h);
+	glViewport(xView, yView, w, h);
 
 	/* Calcula a correção de aspecto */
 	fAspect = (GLfloat)w / (GLfloat)h;
-
 	Viewing();
+
 }
 /*-------------------------------------------Funçoes de Textura--------------------------------------------*/
 
@@ -375,19 +370,35 @@ void Texture1(){
     glTexImage2D(GL_TEXTURE_2D, 0, 3, imagemTextura.width,imagemTextura.height, 0, GL_RGB, GL_UNSIGNED_BYTE,imagemTextura.data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//ampliacao de acordo com a media dos pontos
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); //reducao de acordo com a media dos pontos
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //repeticao na horizontal
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //repeticao na horizontal
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); //repeticao na vertical
     glEnable(GL_TEXTURE_GEN_S);
     glEnable(GL_TEXTURE_GEN_T);
 
 }
+void carregaTextura(char *nome, int i)
+{
+    BMPImage imagemTextura;
+
+    texture_id[i]=i;
+    glBindTexture(GL_TEXTURE_2D, texture_id[i]);
+    getBitmapImageData(nome, &imagemTextura);
+    gluBuild2DMipmaps (GL_TEXTURE_2D, 3, imagemTextura.width, imagemTextura.height, GL_RGB,GL_UNSIGNED_BYTE, imagemTextura.data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    glEnable(GL_TEXTURE_GEN_S);
+    glEnable(GL_TEXTURE_GEN_T);
+
+}
+
 /*-------------------------------------------Funçoes de Desenho--------------------------------------------*/
 
 
 void carro(GLfloat r, GLfloat g, GLfloat b){
 
 	glPushMatrix();
-		glTranslatef(0.0,5.0,0.0);
+		 glTranslatef(0.0,5.0,0.0);
 		//rodas
 		glPushMatrix();
 			
@@ -585,10 +596,12 @@ void arvore(GLfloat x, GLfloat z){
     GLfloat arvoreZ = z;
     //arvore
         glPushMatrix();
-             glTranslatef(arvoreX,0,arvoreZ);//Deixar com a base mais rente ao plano do jogo, portanto subir 15 unidades em Y
-             glScaled(0.05,0.05,0.05);//Deixar mais proporcional ao Cenário
+             glTranslatef(arvoreX,0,arvoreZ);
+             glScaled(0.05,0.05,0.05);
             //tronco       
-            corCorrente(0.117,0.0549,0.0235);
+            corCorrente(1,1,1);
+			glEnable(GL_TEXTURE_2D);
+	 		glBindTexture(GL_TEXTURE_2D, texture_id[MADEIRA]);
             glPushMatrix();
                  glTranslatef(0,2,0);
                  glRotatef(90,0.5,0,0);
@@ -596,6 +609,7 @@ void arvore(GLfloat x, GLfloat z){
                    gluQuadricNormals(qobj, GLU_SMOOTH);
                  gluCylinder(qobj,0.5, 1.5, 5,50, 10);
             glPopMatrix();
+			glDisable(GL_TEXTURE_2D); 
             //folhas   
 			corCorrente(0.0,0.3,0.0);
             glPushMatrix();
@@ -612,8 +626,10 @@ void arvore(GLfloat x, GLfloat z){
 }
 
 void mato(){
-	 corCorrente(0.0,0.1,0.0);
-	glPushMatrix();
+	 //corCorrente(0.0,0.1,0.0);
+	 glEnable(GL_TEXTURE_2D);
+	 glBindTexture(GL_TEXTURE_2D, texture_id[MATO]);
+	 glPushMatrix();
 		 //esquerda
 		 glBegin(GL_POLYGON);
 			glVertex3f(ComprimentoPista,0.0,-LarguraMato);
@@ -630,7 +646,7 @@ void mato(){
 			glVertex3f(ComprimentoPista,0.0,LarguraMato);
 		 glEnd();
 	glPopMatrix();
-
+    glDisable(GL_TEXTURE_2D); 
 }
 
 
@@ -638,6 +654,7 @@ void pista(){
 	
      corCorrente(1.0,1.0,1.0);
 	 glEnable(GL_TEXTURE_2D);
+	 glBindTexture(GL_TEXTURE_2D, texture_id[PISTA]);
      glBegin(GL_POLYGON);
         glVertex3f(ComprimentoPista,0.0,-LarguraPista);
         glVertex3f(ComprimentoPista,0.0,LarguraPista);
@@ -647,26 +664,39 @@ void pista(){
 	 glDisable(GL_TEXTURE_2D); 
 	
 }
-void desenha_Carros(){
+void desenha_Carro(){
 
 	glPushMatrix();	  
 	   glScaled(0.01,0.01,0.01);
-		carro(0.7,0.0,0.0);//vermelho
-	
-		//implementar aqui a chamada para desenho dos carros concorrentes
-	
+	   carro(0.7,0.0,0.0);//vermelho
 	glPopMatrix();
 	glutPostRedisplay();
 }
 
+void desenha_Carros(float tX,GLfloat r, GLfloat g, GLfloat b){
+	int i,x1;
+	
+	glPushMatrix();
+		glScaled(0.01,0.01,0.01);
+		for(i=0; i<quantidadeCarros; i++){
+			 glTranslatef(tX, 0.0, 0.0);
+			 carro(r,g,b);			 
+		}
+	glPopMatrix();
+	glutPostRedisplay();
+}
+
+
 void desenha_Cenario(){
-	int i, x1,x2, x3, z;
+	int i, x1,x2, x3, z, xCarros;
 	mato();
 	pista();
+	
 	glPushMatrix();
 		x1 = 0;
 		x2 = 2;
 		x3 = 3;
+		//xCarros = tX_Carros;
 		z = -InicioArvore;
 		// Floresta Lado Esquerdo
 		for(i=0; i<quantidadeArvore; i++){		
@@ -699,7 +729,7 @@ void desenha_Cenario(){
 			x1 = x1-5;
 			x2 = x2-5;
 			x3 = x3-5;		
-		}
+		}	
 
 	glPopMatrix();
 	glutPostRedisplay();
@@ -710,6 +740,71 @@ void desenha_Cenario(){
 
 /*---------------------------------------Funcoes de Interacao--------------------------------------------*/
 
+void setCameraLateral(){
+			if(modoCamera!=4){
+				modoCamera = 4;
+				PosicaoCameraX = tX_Carro;
+				PRefX = tX_Carro;
+				PosicaoCameraY = 0.009;
+				PRefY = 0.4;
+				PosicaoCameraZ = -1;
+				PRefZ = 0;
+				Vx = 0;
+				Vy = 0;
+				Vz = -1;
+				Viewing();
+				glutPostRedisplay();
+			}	
+}
+
+void setCameraFrontal(){
+	if(modoCamera!=3){
+				modoCamera = 3;
+				PosicaoCameraX = tX_Carro+10;
+				PRefX=tX_Carro;
+				PosicaoCameraY = 5;
+				PRefY = 0;
+				PosicaoCameraZ = 0;
+				PRefZ = 0;
+				Vx = -1;
+				Vy = 0;
+				Vz = 0;		
+				Viewing();
+				glutPostRedisplay();
+	}
+}
+void setCameraTraseira(){
+	if(modoCamera!=2){
+				modoCamera = 2;
+				PosicaoCameraX = tX_Carro-10;
+				PRefX=tX_Carro;
+				PosicaoCameraY = 5;
+				PRefY = 0;
+				PosicaoCameraZ = 0;
+				PRefZ = 0;
+				Vx = 1;
+				Vy = 0;
+				Vz = 0;		
+				Viewing();
+				glutPostRedisplay();
+	}
+}
+void setCameraSuperior(){
+		if(modoCamera!=1){
+				modoCamera = 1;
+				PosicaoCameraX = tX_Carro+1;
+				PRefX = tX_Carro +1;
+				PosicaoCameraY = 5;
+				PRefY = 0;
+				PosicaoCameraZ = 0;
+				PRefZ = 0;
+				Vx = 1;
+				Vy = 0;
+				Vz = 0;		
+				Viewing();
+				glutPostRedisplay();
+		}
+}
 
 void SpecialKeyboard(int key, int x, int y){
 
@@ -739,30 +834,6 @@ void SpecialKeyboard(int key, int x, int y){
 			
 		}
 		break;
-
-	case GLUT_KEY_F1:
-		tX_Cenario+=0.5;
-		break;
-
-	case GLUT_KEY_F2:
-		tX_Cenario-=0.5;
-		break;
-	case GLUT_KEY_F3:
-		tY_Cenario+=0.5;
-		break;
-
-	case GLUT_KEY_F4:
-		tY_Cenario-=0.5;
-		break;
-
-	case GLUT_KEY_F5:
-		tZ_Cenario+=0.5;
-		break;
-
-	case GLUT_KEY_F6:
-		tZ_Cenario-=0.5;
-		break;
-
 	default:
 		break;
 
@@ -775,7 +846,6 @@ void keyboard(unsigned char key, int x, int y){
 		case 'x':
 			rX_Carro += 0.5;
 			break;
-
 		case 'X':
 			rX_Carro -= 0.5;
 			break;
@@ -795,33 +865,32 @@ void keyboard(unsigned char key, int x, int y){
 			//implementar aqui zoomin para as quatro perspectivas
 			break;
 		case '-':		
-				if(modoCamera==1){
-					if(PosicaoCameraY<10){
-						PosicaoCameraY += 1;
-						Viewing();
-			        	glutPostRedisplay();
-					}
-				}else if(modoCamera==2){
-						if(PosicaoCameraY<10 && PosicaoCameraX> (tX_Carro-12)){
-							  PosicaoCameraY -= 1;
-							  PosicaoCameraX -= 1;
-							  Viewing();
-							  glutPostRedisplay();
-							}
-					  }else if(modoCamera==3){
-							  //implementar aqui zoom out para quando a camera estiver na vista frontal
-								  
-					  		}else if(modoCamera==4){
-								  
-								 //implementar aqui zoom out para quando a camera estiver na vista lateral
-									
-					  		}		
-					
+			//implementar aqui zoomout para as quatro perspectivas
 			break;
+		case 'l':
+		case 'L':
+			setCameraLateral();
+			break;
+		case 'f':
+		case 'F':
+			setCameraFrontal();
+			break;
+		case 't':
+		case 'T':
+			setCameraTraseira();
+			break;
+		case 's':
+		case 'S':
+			setCameraSuperior();
+			break;
+		case 27:
+    		exit(0);
+    		break;
+		default:
+   			break;
 	}
 }
 
-/**MENU**/
 void ProcessMenu(int value)
 { 
     switch(value)
@@ -837,72 +906,20 @@ void ProcessMenu(int value)
 			start = 1;
 			break;	
 		case 4:
-			if(modoCamera!=4){
-				modoCamera = 4;
-				PosicaoCameraX = tX_Carro;
-				PRefX = tX_Carro;
-				PosicaoCameraY = 0.009;
-				PRefY = 0.4;
-				PosicaoCameraZ = -1;
-				PRefZ = 0;
-				Vx = 0;
-				Vy = 0;
-				Vz = -1;
-				Viewing();
-				glutPostRedisplay();
-			}
+			setCameraLateral();
 			break;
 		case 5:
-			if(modoCamera!=3){
-				modoCamera = 3;
-				PosicaoCameraX = tX_Carro+10;
-				PRefX=tX_Carro;
-				PosicaoCameraY = 5;
-				PRefY = 0;
-				PosicaoCameraZ = 0;
-				PRefZ = 0;
-				Vx = -1;
-				Vy = 0;
-				Vz = 0;		
-				Viewing();
-				glutPostRedisplay();
-			}
+			setCameraFrontal();
 			break;
 		case 6:
-			if(modoCamera!=2){
-				modoCamera = 2;
-				PosicaoCameraX = tX_Carro-10;
-				PRefX=tX_Carro;
-				PosicaoCameraY = 5;
-				PRefY = 0;
-				PosicaoCameraZ = 0;
-				PRefZ = 0;
-				Vx = 1;
-				Vy = 0;
-				Vz = 0;		
-				Viewing();
-				glutPostRedisplay();
-			}
+			setCameraTraseira();
 			break;
 		case 7:
-			if(modoCamera!=1){
-				modoCamera = 1;
-				PosicaoCameraX = tX_Carro+1;
-				PRefX = tX_Carro +1;
-				PosicaoCameraY = 5;
-				PRefY = 0;
-				PosicaoCameraZ = 0;
-				PRefZ = 0;
-				Vx = 1;
-				Vy = 0;
-				Vz = 0;		
-				Viewing();
-				glutPostRedisplay();
-			}
+			setCameraSuperior();
 			break;
         }
 
-    glutPostRedisplay();    // Redisplay
+    glutPostRedisplay();  
 
 }
 void  menu(){
@@ -916,27 +933,25 @@ void  menu(){
 	glutAddMenuEntry("Camera Traseira",6);
 	glutAddMenuEntry("Camera Superior",7);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
-	//Implementar aqui funcao para disponibilizar menu
+	
 }
 /*-------------------------------------------Animacao----------------------------------------------------*/
-void colisa(){
-		//Implementar aqui as animacoes de colisao
-}
 
 void animacao(){
-	//implementar aqui velocidade gradativa
-	
+
 	if(start==1 && pause==0){
 			//velocidade constante
-			tX_Carro+=0.5;
-			PosicaoCameraX+=0.5;
-			PRefX+=0.5;
+			tX_Carro+=0.7;
+			PosicaoCameraX+=0.7;
+			PRefX+=0.7;
 			rZ_rodas+=0.7;
+		    tX_CarroVerde+=0.02;
+			tX_CarroAzul+=0.1;
+		    tX_CarroCinza+=0.02;
 			Viewing();
 			glutPostRedisplay();
 	
 	}
-	//implementar aqui chamada de colisao caso precise
 }
 void timer(int i){
 	glutPostRedisplay();
@@ -950,16 +965,30 @@ void display(){
  
 	glPushMatrix();
 		glPushMatrix();
-			glTranslatef(tX_Cenario, 0.0, 0.0);
-			glTranslatef(0.0, tY_Cenario, 0.0);
-			glTranslatef(0.0, 0.0, tZ_Cenario);
-			glScalef(s_Cenario,s_Cenario,s_Cenario);
-			glRotatef(rX_Cenario, 1.0, 0.0, 0.0);
-			glRotatef(rY_Cenario, 0.0, 1.0, 0.0);
-			glRotatef(rZ_Cenario, 0.0, 0.0, 1.0);
 			desenha_Cenario();
 		glPopMatrix();
-
+	
+		glPushMatrix();
+	        glTranslatef(tX_CarroVerde, 0.0, 0.0);
+			glTranslatef(0.0, 0.0, tZ_CarroVerde);
+			glRotatef(180, 0.0, 1.0, 0.0);
+			desenha_Carros(tX_CarroVerde,0,0.7,0);
+		glPopMatrix();
+	 	
+		glPushMatrix();
+	        glTranslatef(tX_CarroAzul, 0.0, 0.0);
+	        glTranslatef(0.0, 0.0, tZ_CarroAzul);
+			glRotatef(180, 0.0, 1.0, 0.0);
+			desenha_Carros(tX_CarroAzul,0,0.0,0.7);
+		glPopMatrix();
+	
+		glPushMatrix();
+	        glTranslatef(tX_CarroCinza, 0.0, 0.0);
+	        glTranslatef(0.0, 0.0, tZ_CarroCinza);
+			glRotatef(180, 0.0, 1.0, 0.0);
+			desenha_Carros(tX_CarroCinza,0.5,0.5,0.5);
+		glPopMatrix();
+	
 		glPushMatrix();
 			glTranslatef(tX_Carro, 0.0, 0.0);
 			glTranslatef(0.0, tY_Carro, 0.0);
@@ -968,7 +997,7 @@ void display(){
 			glRotatef(rX_Carro, 1.0, 0.0, 0.0);
 			glRotatef(rY_Carro, 0.0, 1.0, 0.0);
 			glRotatef(rZ_Carro, 0.0, 0.0, 1.0);
-			desenha_Carros();
+			desenha_Carro();
 		glPopMatrix();
 
 	glPopMatrix();
@@ -976,35 +1005,28 @@ void display(){
 	glutSwapBuffers();
 }
 
-void capa(){
-	//implementar aqui viewport inicial que disponibiliza a capa como textura na janela de recorte e apos pressionar enter chame a viewport1	
-}
-/*-----------------------------------------------Pontuacao do jogo-------------------------------------------------*/
-
-void disponibilizaPontuacao(){
-	//Implementar aqui viewport para visualizacao da pontuacao e do clock	
-}
-void pontuacao(){
-	//Implementar aqui logica da pontuacao do jogo	
-}
 /*-----------------------------------------------Main-------------------------------------------------*/
 
 int main(int argc, char* argv[]){
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(DEFAULT_WINDOW_SIZE_W, DEFAULT_WINDOW_SIZE_H);
 	glutCreateWindow("SpeedWay 3D");	
 	inicializar();
+	carregaTextura("asfalto.bmp", PISTA);
+	carregaTextura("mato.bmp", MATO);
+	carregaTextura("madeira.bmp", MADEIRA);
+	glutDisplayFunc(display);
+	glutReshapeFunc(ChangeSize);
 	menu();
+	SetupRC();
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(SpecialKeyboard);
-	Texture1();
-	glutDisplayFunc(display);
 	glutIdleFunc(animacao);
 	glutTimerFunc(time, timer, 1);
-	glutReshapeFunc(ChangeSize);
-	SetupRC();
+
+
 	glutMainLoop();
 
   return 0;
