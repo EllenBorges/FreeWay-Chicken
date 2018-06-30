@@ -1,14 +1,14 @@
 /*
 Computacao Grafica - Projeto Final - main
 Ellen Priscila Borges Oliveira
-Versao: 1.8
+Versao: 1.9
 */
 
 #include <GL/glut.h>
 #include <stdio.h>
 #include <stdlib.h>
 //#include "loadTexture.h"
-#define DEFAULT_WINDOW_SIZE_W 1500.0
+#define DEFAULT_WINDOW_SIZE_W 1000.0
 #define DEFAULT_WINDOW_SIZE_H 1000.0
 #define MADEIRA 3
 #define MATO 2
@@ -883,6 +883,9 @@ void keyboard(unsigned char key, int x, int y){
 		case 'S':
 			setCameraSuperior();
 			break;
+		case 8:
+			pause = 1;
+			break;
 		case 27:
     		exit(0);
     		break;
@@ -933,7 +936,7 @@ void  menu(){
 	glutAddMenuEntry("Camera Traseira",6);
 	glutAddMenuEntry("Camera Superior",7);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
-	
+	glutPostRedisplay();
 }
 /*-------------------------------------------Animacao----------------------------------------------------*/
 
@@ -950,7 +953,6 @@ void animacao(){
 		    tX_CarroCinza+=0.02;
 			Viewing();
 			glutPostRedisplay();
-	
 	}
 }
 void timer(int i){
@@ -1014,18 +1016,17 @@ int main(int argc, char* argv[]){
 	glutInitWindowSize(DEFAULT_WINDOW_SIZE_W, DEFAULT_WINDOW_SIZE_H);
 	glutCreateWindow("SpeedWay 3D");	
 	inicializar();
+	SetupRC();
 	carregaTextura("asfalto.bmp", PISTA);
 	carregaTextura("mato.bmp", MATO);
 	carregaTextura("madeira.bmp", MADEIRA);
 	glutDisplayFunc(display);
-	glutReshapeFunc(ChangeSize);
-	menu();
-	SetupRC();
+	glutReshapeFunc(ChangeSize);	
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(SpecialKeyboard);
 	glutIdleFunc(animacao);
 	glutTimerFunc(time, timer, 1);
-
+	menu();
 
 	glutMainLoop();
 
