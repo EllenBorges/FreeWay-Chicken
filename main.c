@@ -7,7 +7,7 @@ Versao: 1.9
 #include <GL/glut.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include "loadTexture.h"
+
 #define DEFAULT_WINDOW_SIZE_W 1500.0
 #define DEFAULT_WINDOW_SIZE_H 1000.0
 #define MADEIRA 3
